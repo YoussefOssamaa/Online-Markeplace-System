@@ -5,7 +5,7 @@
  */
 class user {
 
-    constructor(username="",lastname="",password="",email="",phone_number="") {
+    constructor(username="",lastname="",password="",email="",phone_number="",address="") {
         this.username=username;
         this.password=password;
         this.email=email;
@@ -13,11 +13,36 @@ class user {
         this.address=address;
         this.phone_number=phone_number;
     }
+    /**
+     * 
+     */
+    getId() {
+        
+    }
+    display(){
+        console.log(this.username);
+    }
 }
 document.getElementById("loginbutton").onclick=()=>{
     let lPassword=document.getElementById("password").value; // The l indicates that this is the login password and username
     let lUsername=document.getElementById("username").value;
 }
-document.getElementById("signupbutton").onclick=()=>{
-
-}
+let f=null;
+document.getElementById("signupbutton").onclick=()=>
+    {
+    let sPassword=document.getElementById("SUpassword").value; // The s indicates that this is the signup password and username
+    let sUsername=document.getElementById("SUusername").value;
+    let sEmail=document.getElementById("SUemail").value;
+    let sLastname=document.getElementById("SUlastname").value;
+    let sAddress=document.getElementById("SUaddress").value;
+    let sPhoneno=document.getElementById("SUphonenumber").value;
+    let Newuser= new user(username=sUsername,
+        lastname=sLastname,
+        password=sPassword,
+        email=sEmail,
+        phone_number=sPhoneno,
+        address=sAddress);
+        /*if(f==null)
+        f=new File(filebits=['sample content'],filename="output.txt");*/
+        Newuser.display();
+    }
