@@ -1,0 +1,71 @@
+# Step 1: Install CockroachDB (On Each Node)
+curl https://binaries.cockroachdb.com/cockroach-v21.2.7.linux-amd64.tgz | tar -xzv
+sudo mv cockroach-v21.2.7.linux-amd64/cockroach /usr/local/bin/
+rm -rf cockroach-v21.2.7.linux-amd64*
+cockroach version
+sudo dhclient
+sudo mkdir -p /cockroach/cockroach-data
+sudo chown $USER:$USER /cockroach -R
+
+# Step 2: Configure Networking (Static IPs)
+# Node 1
+sudo nmcli connection modify "Wired connection 1" ipv4.addresses 192.168.100.10/24 ipv4.gateway 192.168.100.1 ipv4.dns "8.8.8.8 1.1.1.1" ipv4.method manual
+sudo nmcli connection down "Wired connection 1"
+sudo nmcli connection up "Wired connection 1"
+ip a
+
+# Node 2
+sudo nmcli connection modify "Wired connection 1" ipv4.addresses 192.168.100.11/24 ipv4.gateway 192.168.100.1 ipv4.dns "8.8.8.8 1.1.1.1" ipv4.method manual
+sudo nmcli connection down "Wired connection 1"
+sudo nmcli connection up "Wired connection 1"
+ip a
+
+# Node 3
+sudo nmcli connection modify "Wired connection 1" ipv4.addresses 192.168.100.12/24 ipv4.gateway 192.168.100.1 ipv4.dns "8.8.8.8 1.1.1.1" ipv4.method manual
+sudo nmcli connection down "Wired connection 1"
+sudo nmcli connection up "Wired connection 1"
+ip a
+
+ping 192.168.100.10
+ping 192.168.100.11
+ping 192.168.100.12
+
+# Step 3: Start CockroachDB Cluster
+# Node 1 (Initial Node / Bootstrap)
+cockroach start --insecure --listen-addr=192.168.100.10:26257 --http-addr=192.168.100.10:8080 --join=192.168.100.10:26257 --store=/cockroach/cockroach-data
+cockroach init --insecure --host=192.168.100.10
+
+# Node 2
+cockroach start --insecure --listen-addr=192.168.100.11:26257 --http-addr=192.168.100.11:8080 --join=192.168.100.10:26257 --store=/cockroach/cockroach-data
+
+# Node 3
+cockroach start --insecure --listen-addr=192.168.100.12:26257 --http-addr=192.168.100.12:8080 --join=192.168.100.10:26257 --store=/cockroach/cockroach-data
+
+# Step 4: Web UI Monitoring
+# Open in browser: http://192.168.100.10:8080
+
+# Step 5: SQL Access & Data Operations
+nano create_tables.sql
+# Contents:
+# CREATE DATABASE testdb;
+# USE testdb;
+# CREATE TABLE users (id INT PRIMARY KEY, name STRING);
+# INSERT INTO users (id, name) VALUES (1, 'name1');
+# SELECT * FROM users;
+
+nano insert_data.sql
+# Contents:
+# USE testdb;
+# INSERT INTO users (id, name) VALUES (1, 'Name1');
+# INSERT INTO users (id, name) VALUES (2, 'Name2');
+# INSERT INTO users (id, name) VALUES (3, 'Name3');
+
+cockroach sql --insecure --host=192.168.100.10:26257
+cockroach sql --insecure --host=192.168.100.10 < create_tables.sql
+cockroach sql --insecure --host=192.168.100.10 < insert_data.sql
+
+# Test from another node (e.g. Node 2)
+cockroach sql --insecure --host=192.168.100.11
+# Then inside SQL shell:
+# USE testdb;
+# SELECT * FROM users;
