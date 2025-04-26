@@ -3,7 +3,7 @@
 <html>
     <head>
         <title>
-            Online MarketPlace (tbn)
+            Online MarketPlace login page 
         </title>
     </head>
     <body>
@@ -11,12 +11,13 @@
         <img src="online_marketplaceico.bmp" height="400" width="600">
         <h1>  <u>Login</u></h1> 
         <h2>
+        <form>
             Username: <br> 
-            <input id ="username"><br> 
-            Password: <br> <input type="password" id ="password">
-            <br><button type="submit" id="loginbutton">
-                Login
-            </button> <!-- -->
+            <input id ="username" required minlength="2" ><br> 
+            Password: <br> <input type="password" id ="password" minlength="1" required>
+            <br><button type="submit" id="loginbutton">Login</button>
+         <!-- -->
+        </form>
         </h2>
     </body>        
     <script src="interface.js"></script>

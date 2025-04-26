@@ -1,21 +1,25 @@
 <!DOCTYPE html>
 <html>
+    <title>
+        Online MP Sign up page 
+    </title>
     <body>
         <img src="online_marketplaceico.bmp" height="400" width="600">
         <h1 id="signuptitle"><u>Sign up</u></h1>
+        <form>
         <h2 id="signupelements">
             Enter Firstname: <br> 
-            <input id ="SUusername"> 
+            <input id ="SUusername" required minlength="1"> 
             <br>Create Password:<br>
-            <input id ="SUpassword">
+            <input id ="SUpassword" required minlength="1">
             <br>Create Email<br> 
-            <input type="email" id="SUemail"> 
+            <input type="email" id="SUemail" required minlength="1"> 
             <br>Enter Lastname<br>
-            <input id="SUlastname">
+            <input id="SUlastname" required minlength="1">
             <br>Enter address<br>
-            <input id="SUaddress">
+            <input id="SUaddress" required minlength="1">
             <br>Enter phone no.<br>
-            <input id="SUphonenumber">
+            <input id="SUphonenumber" required minlength="1">
             <button type="submit" id="signupbutton">
                 Register
             </button>
@@ -23,5 +27,6 @@
             have SU before them to indicate that this is 
             the Sign Up password/username etc. -->
         </h2>
+        </form>
     </body>
 </html>

@@ -37,12 +37,12 @@ document.getElementById("signupbutton").onclick=()=>
     let sLastname=document.getElementById("SUlastname").value;
     let sAddress=document.getElementById("SUaddress").value;
     let sPhoneno=document.getElementById("SUphonenumber").value;
-    let Newuser= new user(username=sUsername,
-        lastname=sLastname,
-        password=sPassword,
-        email=sEmail,
-        phone_number=sPhoneno,
-        address=sAddress);
+    let Newuser= new user(sUsername,
+        sLastname,
+        sPassword,
+        sEmail,
+        sPhoneno,
+        sAddress);
         /*if(f==null)
         f=new File(filebits=['sample content'],filename="output.txt");*/
         Newuser.display();
