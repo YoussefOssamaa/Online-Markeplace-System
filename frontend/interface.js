@@ -26,6 +26,7 @@ class user {
 document.getElementById("loginbutton").onclick=()=>{
     let lPassword=document.getElementById("password").value; // The l indicates that this is the login password and username
     let lUsername=document.getElementById("username").value;
+    console.log(lUsername+lPassword);
 }
 let f=null;
 document.getElementById("signupbutton").onclick=()=>
