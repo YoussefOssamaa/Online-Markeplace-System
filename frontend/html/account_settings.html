@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f6f8; /* Light grey background */
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #2c3e50; /* Dark blue-grey heading */
+            margin-bottom: 5px;
+        }
+        p {
+            color: #7f8c8d; /* Grey subheading */
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+        .profile-photo {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .profile-photo img {
+            width: 50px;
+            height: 50px;
+            border-radius: 5px;
+            margin-right: 10px;
+            background-color: #eee; /* Placeholder background */
+            object-fit: cover; /* Ensure image covers the area */
+        }
+        .profile-photo button {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .profile-photo button.remove {
+            color: #e74c3c; /* Red color for remove button */
+            border-color: #e74c3c;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.9em;
+            color: #34495e; /* Dark grey label */
+            margin-bottom: 5px;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        .checkbox-group {
+            margin-bottom: 10px;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+            color: #34495e;
+            margin-bottom: 5px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .actions button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .actions button.cancel {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        .actions button.save {
+            background-color: #3498db; /* Blue save button */
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Account Settings</h1>
+        <p>Manage your account settings and preferences</p>
+
+        <section class="profile-photo">
+            <img src="placeholder-profile.png" alt="Profile Photo">
+            <button>Change Photo</button>
+            <button class="remove">Remove</button>
+        </section>
+
+        <section class="personal-information">
+            <h2>Personal Information</h2>
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" value="John">
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" value="Doe">
+            </div>
+            <div class="form-group full-width">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" value="john.doe@example.com">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" placeholder="Optional">
+            </div>
+        </section>
+
+        <section class="change-password">
+            <h2>Change Password</h2>
+            <div class="form-group full-width">
+                <label for="currentPassword">Current Password</label>
+                <input type="password" id="currentPassword">
+            </div>
+            <div class="form-group full-width">
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword">
+            </div>
+            <div class="form-group full-width">
+                <label for="confirmNewPassword">Confirm New Password</label>
+                <input type="password" id="confirmNewPassword">
+            </div>
+        </section>
+
+        <section class="notification-preferences">
+            <h2>Notification Preferences</h2>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" checked> Email notifications for new messages
+                </label>
+            </div>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" checked> Email notifications for order updates
+                </label>
+            </div>
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" checked> Marketing communications
+                </label>
+            </div>
+        </section>
+
+        <div class="actions">
+            <button class="cancel">Cancel</button>
+            <button class="save">Save Changes</button>
+        </div>
+    </div>
+</body>
+</html>
