@@ -205,3 +205,32 @@
   text-align: center;
 }
 
+.search-dropdown {
+  position: absolute;
+  top: 60px;
+  background: rgb(255, 255, 255);
+  border: 1px solid #ccc;
+  width: 300px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 900;
+}
+
+.search-item {
+  color: black;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.search-item img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.search-item:hover {
+  background-color: #9e9e9e;
+}

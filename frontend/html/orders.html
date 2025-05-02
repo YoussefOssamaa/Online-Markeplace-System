@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Orders</title>
+
+    <!-- This code is needed for responsive design to work.
+      (Responsive design = make the website look good on
+      smaller screen sizes like a phone or a tablet). -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Load a font called Roboto from Google Fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Here are the CSS files for this page. -->
+    <link rel="stylesheet" href="../css/general.css">
+    <link rel="stylesheet" href="../css/site-header.css">
+    <link rel="stylesheet" href="../css/orders.css">
+  </head>
+  <body>
+    <div class="site-header">
+      <div class="site-header-left-section">
+        <a href="site.html" class="header-link">
+          <img class="site-logo"
+            src="/images/site_logo_white.png">
+        </a>
+      </div>
+
+      <div class="site-header-middle-section">
+        <input class="search-bar" id="searchInput" type="text" placeholder="Search">
+        <div id="searchResults" class="search-dropdown"></div>
+        <button class="search-button">
+          <img class="search-icon" src="/images/icons/search-icon.png">
+        </button>
+      </div>
+
+      <div class="site-header-right-section">
+        <div class="profile-menu">
+          <div class="profile-button">
+            <img src="/images/profile-pic.jpg">
+            <span class="arrow">▼</span>
+          </div>
+          <div class="dropdown">
+            <a href="dashboard.html">My Profile</a>
+            <a href="orders.html">My orders</a>
+            <a href="loginpage.html">Logout</a>
+          </div>
+        </div>
+
+        <a class="cart-link header-link" href="checkout.html">
+          <img class="cart-icon" src="/images/icons/cart-icon.png">
+          <div class="cart-quantity">0</div>
+          <div class="cart-text">Cart</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="page-title">Your Orders</div>
+
+      <div class="orders-grid js-orders-grid">
+        
+      </div>
+    </div>
+    <script src="/js/search.js"></script>
+    <script src="/js/orders.js"></script>
+  </body>
+</html>

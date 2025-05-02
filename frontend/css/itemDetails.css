@@ -1,0 +1,69 @@
+.main {
+  max-width: 850px;
+  margin-top: 90px;
+  margin-bottom: 100px;
+  padding-left: 20px;
+  padding-right: 20px;
+
+  /* margin-left: auto;
+     margin-right auto;
+     Is a trick for centering an element horizontally
+     without needing a container. */
+  margin-left: auto;
+  margin-right: auto;
+}
+.product-container {
+  display: flex;
+  max-width: 1000px;
+  margin: 40px auto;
+  gap: 40px;
+}
+
+.product-image {
+  width: 400px;
+}
+
+.product-image img {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.product-details {
+  flex: 1;
+}
+
+.product-details h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.stars {
+  color: orange;
+  margin-bottom: 10px;
+}
+
+.price {
+  font-size: 22px;
+  color: green;
+  margin: 20px 0;
+}
+
+.add-to-cart-btn {
+  padding: 12px 60px;
+  background: #f0c14b;
+  border: 1px solid #a88734;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+.add-to-cart-btn:hover {
+  background: #e2b33b;
+}
+
+.status {
+  color: #b12704;
+  font-weight: bold;
+  margin-bottom: 10px;
+}

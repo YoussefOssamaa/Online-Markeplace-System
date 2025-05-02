@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketplace categories</title>
+    <title>Product Details</title>
        <link rel="preconnect" href="https://fonts.googleapis.com">
        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -11,9 +11,10 @@
        
        <link rel="stylesheet" href="/css/general.css">
        <link rel="stylesheet" href="/css/site-header.css">
-       <link rel="stylesheet" href="/css/site.css">
+       <link rel="stylesheet" href="/css/itemDetails.css">
   </head>
-  <body>
+  
+<body>
     <div class="site-header">
       <div class="site-header-left-section">
         <a href="categories.html" class="header-link">
@@ -21,7 +22,7 @@
             src="/images/site_logo_white.png">
         </a>
       </div>
-  
+ 
       <div class="site-header-middle-section">
         <input class="search-bar" id="searchInput" type="text" placeholder="Search">
         <div id="searchResults" class="search-dropdown"></div>
@@ -29,7 +30,7 @@
           <img class="search-icon" src="/images/search-icon.png">
         </button>
       </div>
-  
+ 
       <div class="site-header-right-section">
         <div class="profile-menu">
           <div class="profile-button">
@@ -38,8 +39,8 @@
           </div>
           <div class="dropdown">
             <a href="dashboard.html">My Profile</a>
-          <a href="orders.html">My orders</a>
-          <a href="loginpage.html">Logout</a>
+            <a href="orders.html">My orders</a>
+            <a href="loginpage.html">Logout</a>
           </div>
         </div>
         <a class="cart-link header-link" href="checkout.html">
@@ -47,15 +48,18 @@
           <div class="cart-quantity js-cart-quantity">0</div>
           <div class="cart-text">Cart</div>
         </a>
+      </div>
+    </div>
+
+    
+    <div class="main">
+
+      <div class="product-container js-product-container">
         
       </div>
     </div>
-    
-    <div class="main">
-      <div class="products-grid js-products-grid">
-      </div>
-    </div>
     <script src="/js/search.js"></script>
-    <script src="/js/items.js"></script>
-  </body>
+  <script src="/js/itemDetails.js"></script> 
+
+</body>
 </html>
