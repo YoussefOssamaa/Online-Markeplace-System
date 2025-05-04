@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Checkout</title>
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="/css/general.css">
+    <link rel="stylesheet" href="/css/checkout-header.css">
+    <link rel="stylesheet" href="/css/ordersSummary.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="checkout-header">
+      <div class="header-content">
+        <div class="checkout-header-left-section">
+          <a href="categories.html">
+            <img class="site-logo" src="/images/site_logo_black.png">
+          </a>
+        </div>
+
+        <div class="checkout-header-middle-section">
+          Total orders report (<a class="return-to-home-link"
+            href="orders.html">3 orders</a>)
+        </div>
+
+        <div class="checkout-header-right-section">
+          <img src="/images/icons/checkout-lock-icon.png">
+        </div>
+      </div>
+    </div>
+    <div class="main">
+      <div class="container">
+        <h2>Orders Summary</h2>
+      
+        <div class="summary">
+          <div class="summary-text">
+            <div><strong>Total Orders:</strong> 8420</div>
+            <div><strong>Highest Orders Month:</strong> November</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="ordersChart"></canvas>
+          </div>
+        </div>
+      
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Order Total Price</th>
+              <th>Ordering Date</th>
+              <th>Delivery Date</th>
+            </tr>
+          </thead>
+          <tbody id="orders-table-body">
+            
+          </tbody>
+        </table>
+      
+        <button id="load-more" class="button">More</button>
+      </div>
+    </div>
+    <script src="/js/ordersSummary.js"></script>
+  </body>
+</html>
