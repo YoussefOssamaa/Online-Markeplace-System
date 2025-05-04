@@ -1,12 +1,12 @@
 let productsHTML =``;
-fetch('/js/products.json')
+fetch('../js/products.json')
 .then(response => response.json())
 .then(products => {
   products.forEach((product) => {
   productsHTML += `<div class="product-container">
             <div class="product-image-container">
               <img class="category-image"
-                src="/${product.image}">
+                src="../${product.image}">
             </div>
   
             <div class="product-name limit-text-to-2-lines">
@@ -15,7 +15,7 @@ fetch('/js/products.json')
   
             <div class="product-rating-container">
               <img class="product-rating-stars"
-                src="/images/ratings/rating-${(product.rating.stars *10)}.png">
+                src="../images/ratings/rating-${(product.rating.stars *10)}.png">
               <div class="product-rating-count link-primary">
               ${product.rating.count}
               </div>
@@ -44,7 +44,7 @@ fetch('/js/products.json')
             <div class="product-spacer"></div>
   
             <div class="added-to-cart js-added-to-cart" data-product-id="${product.id}">
-              <img src="/images/icons/checkmark.png">
+              <img src="../images/icons/checkmark.png">
               Added
             </div>
   

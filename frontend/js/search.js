@@ -17,7 +17,7 @@ function searchProducts(products) {
       const item = document.createElement('div');
       item.className = 'search-item';
       item.innerHTML = `
-        <img src="/${product.image}" alt="${product.name}">
+        <img src="../${product.image}" alt="${product.name}">
         <span>${product.name}</span>
       `;
       item.addEventListener('click', () => {

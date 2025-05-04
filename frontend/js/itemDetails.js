@@ -1,4 +1,4 @@
-fetch('/js/products.json')
+fetch('../js/products.json')
 .then(response => response.json())
 .then(products => {
 
@@ -27,7 +27,7 @@ fetch('/js/products.json')
   } else {
     container.innerHTML = `
       <div class="product-image">
-        <img src="/${product.image}" alt="${product.name}" />
+        <img src="../${product.image}" alt="${product.name}" />
       </div>
       <div class="product-details">
         <h1>${product.name}</h1>
