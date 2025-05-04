@@ -1,7 +1,7 @@
 function renderCart() {
   let orders =[];
 cart = JSON.parse(localStorage.getItem('cart'));
-fetch('/js/products.json')
+fetch('../js/products.json')
 .then(response => response.json())
 .then(products => {
       let totalPrice = 0;
@@ -25,7 +25,7 @@ fetch('/js/products.json')
     
                 <div class="cart-item-details-grid">
                   <img class="product-image"
-                    src="/${matchingCartItem.image}">
+                    src="../${matchingCartItem.image}">
     
                   <div class="cart-item-details">
                     <div class="product-name">

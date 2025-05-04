@@ -1,5 +1,5 @@
 let categoriesHTML = ``;
-fetch('/js/categories.json')
+fetch('../js/categories.json')
 .then(response => response.json())
 .then(categories => {
   categories.forEach((category) => {

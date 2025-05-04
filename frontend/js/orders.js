@@ -40,7 +40,7 @@ orders.forEach((order) => {
     })
   orederHTML += `<div class="order-details-grid">
             <div class="product-image-container">
-              <img src="/${itemImage}">
+              <img src="../${itemImage}">
             </div>
 
             <div class="product-details">
@@ -57,7 +57,8 @@ orders.forEach((order) => {
 
             <div class="product-actions">
             
-                <button class="track-package-button button-secondary js-track-package-button">
+                <button class="track-package-button button-secondary js-track-package-button"
+                data-product-id="${itemId}">
                   Item details
                 </button>
               
@@ -68,8 +69,11 @@ orders.forEach((order) => {
 })
   
   document.querySelector('.js-orders-grid').innerHTML = orederHTML;
-  document.querySelector('.js-track-package-button').addEventListener('click', () => {
-    window.location.href = `itemDetails.html?id=${itemId}`;
+  document.querySelectorAll('.js-track-package-button').forEach(button => {
+    button.addEventListener('click', (event) => {
+      const itemId = button.dataset.productId;
+      window.location.href = `itemDetails.html?id=${itemId}`;
+    });
   });
   searchProducts(products);
 }).catch(error => console.error('Error loading JSON:', error));
