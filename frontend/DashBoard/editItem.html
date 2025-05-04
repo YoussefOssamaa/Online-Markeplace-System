@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Edit Item</title>
+  <script src=
+      "https://cdn.jsdelivr.net/npm/sweetalert2@11">
+  </script>
   <link rel="stylesheet" href="edit-item-styles.css" />
 </head>
 <body>
@@ -21,8 +24,28 @@
 
       <button type="submit">Update Item</button>
     </form>
+
+    <div id="customAlert" class="custom-alert hidden">
+      <div class="custom-alert-box">
+        <h2>Updated</h2>
+        <p id="customAlertMessage">This is the message.</p>
+        <button id="alertOkBtn">OK</button>
+      </div>
+    </div>
+    
+
   </div>
 
   <script src="editItem.js"></script>
+  <!-- <script>
+    function showCustomAlert() {
+        // Create a custom alert box with SweetAlert
+        Swal.fire({
+            title: 'Update Confirmed',
+            text: 'The item has been updated successfully!',
+            confirmButtonText: 'OK'
+        });
+    }
+</script> -->
 </body>
 </html>

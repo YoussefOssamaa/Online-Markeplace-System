@@ -3,18 +3,80 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add New Item</title>
+  <title>Products Report</title>
   <link rel="stylesheet" href="productsReport-styles.css" />
 </head>
 <body>
-    <div class="container">
-        <header class="report-header">
-            <h1>My Products Report</h1>
-        </header>
-        <div class="main-container">
-            <h2>Total Sold Items:</h2>
-            <h2>Top Catagory:</h2>
-            
-        </div>
+  <div class="report-container">
+    <header class="report-header">
+      <h1>Products Report</h1>
+    </header>
+
+    <div class="report-summary">
+      <h2 class="summary-item">Total Sold Items: <span id="totalSold"></span></h2>
+      <h2 class="summary-item">Top Category: <span id="topCategory">N/A</span></h2>
     </div>
+
+    <div class="table-container">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Product ID</th>
+            <th>Product Category</th>
+            <th>Purchase Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data rows will go here -->
+        </tbody>
+      </table>
+    </div>
+    <div class="chart-container">
+        <canvas id="salesChart" width="600" height="300"></canvas>
+      </div>
+      
+  </div>
+  <script src="productsReport.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    const salesChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [{
+          label: 'Items Sold',
+          data: [12, 19, 7, 15, 22, 30, 18, 25, 21, 17, 10, 14], // Replace with actual data
+          borderColor: '#4a90e2',
+          backgroundColor: 'rgba(74, 144, 226, 0.2)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 5
+            }
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Monthly Sales Report',
+            font: {
+              size: 18
+            }
+          }
+        }
+      }
+    });
+  </script>
+  
 </body>
+</html>

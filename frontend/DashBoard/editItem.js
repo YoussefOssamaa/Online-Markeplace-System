@@ -22,6 +22,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // }
   
     // Submit updated item
+
+    function showAlert(message) {
+      const alertBox = document.getElementById("customAlert");
+      const alertMessage = document.getElementById("customAlertMessage");
+    
+      alertMessage.textContent = message;
+      alertBox.classList.remove("hidden");
+    }
+    
+    // Close the alert when "OK" is clicked
+    document.getElementById("alertOkBtn").addEventListener("click", () => {
+      document.getElementById("customAlert").classList.add("hidden");
+      window.close();
+    });
+    
+    
     form.addEventListener("submit", (e) => {
       e.preventDefault();
   
@@ -33,8 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
   
       localStorage.setItem("products", JSON.stringify(items));
   
-      alert("Item updated successfully!");
-      window.close();
+      // alert("Item updated successfully!");
+      showAlert("Your item was updated successfully!");
     });
   });
   
