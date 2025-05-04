@@ -1,0 +1,125 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to bottom right, #cbe5ff, #e0f2ff, #f0f8ff);
+    min-height: 100vh;
+    color: #333;
+}
+
+/* Header */
+.dashboard_header {
+    background: linear-gradient(90deg, #1e88e5, #2196f3);
+    color: white;
+    padding: 1.5rem 0;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.page-title h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.sub-heading {
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+    color: #e3f2fd;
+}
+
+/* Layout */
+.container {
+    display: flex;
+}
+
+/* Sidebar (Aside) */
+aside {
+    padding: 1rem;
+    background-color: #ffffffaa;
+    width: 250px;
+    height: 100vh;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+    border-right: 2px solid #e0e0e0;
+    backdrop-filter: blur(10px);
+}
+
+aside img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto 1rem auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+aside div {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+/* Main Content */
+.row-gutter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 2rem;
+    flex-grow: 1;
+    align-content: flex-start;
+    background: transparent;
+}
+
+/* Card Colors Array Style */
+.prop:nth-child(1)  { background: linear-gradient(135deg, #2196f3, #64b5f6); }
+.prop:nth-child(2)  { background: linear-gradient(135deg, #00bcd4, #4dd0e1); }
+.prop:nth-child(3)  { background: linear-gradient(135deg, #7e57c2, #b39ddb); }
+.prop:nth-child(4)  { background: linear-gradient(135deg, #42a5f5, #90caf9); }
+.prop:nth-child(5)  { background: linear-gradient(135deg, #26c6da, #80deea); }
+.prop:nth-child(6)  { background: linear-gradient(135deg, #5c6bc0, #9fa8da); }
+.prop:nth-child(7)  { background: linear-gradient(135deg, #1e88e5, #64b5f6); }
+
+/* Shared Card Style */
+.prop {
+    color: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    width: 200px;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(10px);
+    text-align: center;
+}
+
+.prop:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Card Link & Title */
+.setting-box {
+    text-decoration: none;
+    color: white;
+    display: block;
+}
+
+.setting-box:hover {
+    text-shadow: 0 0 5px white;
+}
+
+.title {
+    font-size: 1.3rem;
+    font-weight: bold;
+}
+
+.icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url('growth.ico');
+    background-size: contain;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+

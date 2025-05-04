@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Item</title>
+  <link rel="stylesheet" href="edit-item-styles.css" />
+</head>
+<body>
+  <div class="edit-container">
+    <h1>Edit Product</h1>
+    <form id="editForm">
+      <label for="name">New Name:</label>
+      <input type="text" id="name" required />
+
+      <label for="desc">New Description:</label>
+      <textarea id="desc" required></textarea>
+
+      <label for="price">New Price:</label>
+      <input type="number" id="price" min="0" step="0.01" required />
+
+      <button type="submit">Update Item</button>
+    </form>
+  </div>
+
+  <script src="editItem.js"></script>
+</body>
+</html>
