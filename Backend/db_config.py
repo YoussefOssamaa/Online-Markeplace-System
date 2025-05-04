@@ -27,23 +27,11 @@ class Customer(db.Model):
     cart_items = db.relationship('Cart', backref='customer', lazy=True)
     wishlist_items = db.relationship('Wishlist', backref='customer', lazy=True)
 
-class Shipment(db.Model):
-    __tablename__ = 'Shipment'
-
-    shipment_id = db.Column(db.Integer, primary_key=True)
-    shipment_date = db.Column(db.Date)
-    address = db.Column(db.String(40))
-    city = db.Column(db.String(20))
-    country = db.Column(db.String(30))
-
-    orders = db.relationship('Orders', backref='shipment', lazy=True)
-
 class Orders(db.Model):
     __tablename__ = 'Orders'
 
     order_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('Customer.customer_id'), nullable=False)
-    shipment_id = db.Column(db.Integer, db.ForeignKey('Shipment.shipment_id'), nullable=False)
     order_date = db.Column(db.Date)
     total_price = db.Column(db.Numeric(5, 2))
 
@@ -82,30 +70,6 @@ class Product(db.Model):
     order_items = db.relationship('OrderItem', backref='product', lazy=True)
     cart_items = db.relationship('Cart', backref='product', lazy=True)
     wishlist_items = db.relationship('Wishlist', backref='product', lazy=True)
-
-class OrderItem(db.Model):
-    __tablename__ = 'OrderItem'
-
-    order_item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('Orders.order_id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('Product.product_id'), nullable=False)
-    quantity = db.Column(db.Integer)
-    price = db.Column(db.Numeric(4, 2))
-
-class Cart(db.Model):
-    __tablename__ = 'Cart'
-
-    cart_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    customer_id = db.Column(db.Integer, db.ForeignKey('Customer.customer_id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('Product.product_id'), nullable=False)
-    quantity = db.Column(db.Integer)
-
-class Wishlist(db.Model):
-    __tablename__ = 'Wishlist'
-
-    wishlist_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    customer_id = db.Column(db.Integer, db.ForeignKey('Customer.customer_id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('Product.product_id'), nullable=False)
 
 with app.app_context():
     db.drop_all()
