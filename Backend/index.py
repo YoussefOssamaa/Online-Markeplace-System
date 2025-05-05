@@ -264,7 +264,7 @@ def search_item():
                 offset = request.args.get('offset', default=0, type=int)
                 limit = request.args.get('limit', default=10, type=int)
                 search = request.args.get('search_text', default="")
-
+                category_id = request.args.get('category_id', type=int)
                 query = Product.query.join(Category, Product.category_id == Category.category_id)
                 if search:
                     search_filter = f"%{search}%"
@@ -275,7 +275,8 @@ def search_item():
                             Category.name.ilike(search_filter)
                         )
                     )
-
+                if category_id:
+                    query = query.filter(Product.category_id == category_id)
                 products = query.offset(offset).limit(limit).all()
                 # products = Product.query.filter_by().offset(offset).limit(limit).all()
                 products_data = []
@@ -597,3 +598,65 @@ def get_user_profile():
     except Exception as e:
         print(f"Error fetching user profile: {str(e)}")
         return {"err": "Internal server error"}, 500
+
+
+@app.route('/account/update', methods=['POST'])
+def update_account():
+    if 'online_market_id' not in session:
+        return {"err": "you are not authorized"}, 402
+
+    try:
+        user = Customer.query.get(session['online_market_id'])
+        if not user:
+            session.clear()
+            return {"err": "user not found"}, 404
+
+        data = request.get_json()
+
+        # Update personal info
+        user.first_name = data.get('first_name', user.first_name)
+        user.last_name = data.get('last_name', user.last_name)
+        user.email = data.get('email', user.email)
+        user.phone_number = data.get('phone_number', user.phone_number)
+
+        # Optional: Change password
+        current_pw = data.get('current_password')
+        new_pw = data.get('new_password')
+        confirm_pw = data.get('confirm_password')
+
+        if current_pw and new_pw and confirm_pw:
+            if not check_password_hash(user.password, current_pw):
+                return {"err": "Current password is incorrect"}, 400
+            if new_pw != confirm_pw:
+                return {"err": "Passwords do not match"}, 400
+            user.password = generate_password_hash(new_pw)
+
+        db.session.commit()
+        return {"success": "Account updated successfully"}
+
+    except Exception as e:
+        return {"err": "internal server error"}, 500
+
+
+@app.route('/dashboard')
+def dashboard():
+    if 'online_market_id' not in session:
+        return {"err": "unauthorized"}, 401
+
+    user = Customer.query.get(session['online_market_id'])
+    if not user:
+        return {"err": "user not found"}, 404
+
+    return {
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "username": user.username,
+        "balance": user.balance,
+        "email": user.email,
+        "phone": user.phone_number,
+    }
+
+
+
+
+
