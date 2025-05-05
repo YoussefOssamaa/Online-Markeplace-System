@@ -21,10 +21,8 @@
     overflow: hidden;
   }
   
-  /* Header Styling */
   .myProductsHeader {
-     background-color: white; /*original color #007acc */
-    /* background: linear-gradient(135deg, #42a5f5, #90caf9); */
+     background-color: white; 
     color: black;
     padding: 1.5rem 2rem;
     border-bottom: 3px solid #005fa3;
@@ -40,7 +38,6 @@
     font-size: 2rem;
   }
   
-  /* Section Headers */
   .items-for-sale,
   .sold-items {
     padding: 2rem;
@@ -49,7 +46,6 @@
   
   .items-for-sale-container {
     display: flex;
-    /* justify-content: space-between; */
     align-items: center;
   }
   
@@ -64,7 +60,6 @@
     left : 10px;
   }
   
-  /* Button Styling */
   .items-for-sale-btn {
     position: relative;
     left : 625px;
@@ -159,7 +154,6 @@
     padding: 1.5rem 2rem;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    /* margin-top: 2rem; */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
   
