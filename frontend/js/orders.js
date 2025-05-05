@@ -1,11 +1,13 @@
 const orders=JSON.parse(localStorage.getItem('orders')) || '[]';
 console.log(orders);
-fetch('/js/products.json')
+fetch('../js/products.json')
 .then(response => response.json())
 .then(products => {
   let itemImage,itemName,itemId;
   let orederHTML = ``;
 orders.forEach((order) => {
+  const isAdmin = JSON.parse(localStorage.getItem('isAdmin')) || false;
+
   orederHTML += `<div class="order-container">
   <div class="order-header">
     <div class="order-header-left-section">
@@ -17,11 +19,16 @@ orders.forEach((order) => {
         <div class="order-header-label">Total:</div>
         <div>$${order.totalPrice}</div>
       </div>
-      <div>
-      <button class="order-proceed-button button-primary" onclick="location.href='deposit_cash.html'">
-        <img class="order-proceed-icon" src="/images/icons/money-hand.png">  
-      <span>Proceed to pay</span>
-      </button>
+      <div class="order-status">
+        <button class="order-proceed-button button-primary" onclick="location.href='deposit_cash.html'">
+            <img class="order-proceed-icon" src="../images/icons/money-hand.png">  
+            <span>Proceed to pay</span>
+        </button>
+        <button class="order-proceed-button button-primary" 
+          ${isAdmin ? `onclick="location.href='ordersSummary.html'"` : `onclick="alert('Admins Only')"`}>
+            <img class="order-graph-icon" src="../images/icons/graph-icon.png">  
+            <span>Orders Summary</span>
+        </button>
       </div>
     </div>
 
