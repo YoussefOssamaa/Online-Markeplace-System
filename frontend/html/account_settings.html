@@ -15,7 +15,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
         }
         h1 {
@@ -111,12 +111,79 @@
             background-color: #3498db; /* Blue save button */
             color: #fff;
         }
+        /* New styles for account information */
+        .account-info-section {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .account-info-section h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .account-balance {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+        .items-list {
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .item-card {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .item-card:last-child {
+            border-bottom: none;
+        }
+        .item-info {
+            flex-grow: 1;
+        }
+        .item-price {
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .no-items {
+            color: #7f8c8d;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Account Settings</h1>
         <p>Manage your account settings and preferences</p>
+
+        <!-- Account Information Section -->
+        <section class="account-info-section">
+            <h2>Account Information</h2>
+            <div class="account-balance">
+                Current Balance: $<span id="userBalance">0.00</span>
+            </div>
+            
+            <h3>Purchased Items</h3>
+            <div class="items-list" id="purchasedItemsList">
+                <div class="no-items">No purchased items found.</div>
+            </div>
+            
+            <h3>Sold Items</h3>
+            <div class="items-list" id="soldItemsList">
+                <div class="no-items">No sold items found.</div>
+            </div>
+            
+            <h3>Items For Sale</h3>
+            <div class="items-list" id="itemsForSaleList">
+                <div class="no-items">No items currently for sale.</div>
+            </div>
+        </section>
 
         <section class="profile-photo">
             <img src="placeholder-profile.png" alt="Profile Photo">
@@ -128,19 +195,19 @@
             <h2>Personal Information</h2>
             <div class="form-group">
                 <label for="firstName">First Name</label>
-                <input type="text" id="firstName" value="John">
+                <input type="text" id="firstName" value="" readonly>
             </div>
             <div class="form-group">
                 <label for="lastName">Last Name</label>
-                <input type="text" id="lastName" value="Doe">
+                <input type="text" id="lastName" value="" readonly>
             </div>
             <div class="form-group full-width">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" value="john.doe@example.com">
+                <input type="email" id="email" value="" readonly>
             </div>
             <div class="form-group">
                 <label for="phone">Phone Number</label>
-                <input type="text" id="phone" placeholder="Optional">
+                <input type="text" id="phone" placeholder="Optional" readonly>
             </div>
         </section>
 
@@ -164,17 +231,20 @@
             <h2>Notification Preferences</h2>
             <div class="checkbox-group">
                 <label>
-                    <input type="checkbox" checked> Email notifications for new messages
+                    <input type="checkbox" checked>
+                    New Messages
                 </label>
             </div>
             <div class="checkbox-group">
                 <label>
-                    <input type="checkbox" checked> Email notifications for order updates
+                    <input type="checkbox" checked>
+                    Order Updates
                 </label>
             </div>
             <div class="checkbox-group">
                 <label>
-                    <input type="checkbox" checked> Marketing communications
+                    <input type="checkbox">
+                    Marketing Communications
                 </label>
             </div>
         </section>
@@ -184,5 +254,7 @@
             <button class="save">Save Changes</button>
         </div>
     </div>
+
+    <script src="../js/accountsettings.js"></script>
 </body>
 </html>

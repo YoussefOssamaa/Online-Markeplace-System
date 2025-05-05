@@ -1,0 +1,4 @@
+{"timestamp":1746421400175,"event_type":"create","description":"","customer_id":1}
+{"timestamp":1746421405930,"event_type":"login","description":"","customer_id":1}
+{"timestamp": "2025-05-05T05:05:36.891064", "event_type": "create", "description": "", "customer_id": 1}
+{"timestamp": "2025-05-05T05:05:46.802721", "event_type": "login", "description": "", "customer_id": 1}

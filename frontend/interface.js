@@ -40,15 +40,27 @@ login_button.onclick= (e)=>{
         }) 
     })
       .then(response => response.json()) 
+      // In the login button onclick handler:
       .then(data => {
-
-            console.log( data); 
-            setTimeout(() => {
-              }, 2000);
-            if(data.success){
-                window.location.href = './DashBoard/dashboard.html';
-            }
-        })
-        // console.log(lUsername+lPassword);
-    }
-    // let f=null;
+          console.log(data);
+          if(data.success) {
+              // Store user data from the server response
+              const userData = data.userData || {
+                  name: lUsername,
+                  balance: 250.00,  // Default balance 
+                  purchasedItems: 0  // Default purchased items count 
+              };
+              sessionStorage.setItem('userData', JSON.stringify(userData));
+              
+              // Redirect to dashboard on successful login
+              window.location.href = './DashBoard/dashboard.html';
+          } else if(data.err) {
+              // Display error message to user
+              alert("Login failed: " + data.err);
+          }
+      })
+      .catch(error => {
+          console.error('Login error:', error);
+          alert("Login failed: Network error");
+      });
+}

@@ -34,7 +34,10 @@ fetch('../js/products.json')
         ${renderStars(product.rating.stars)}
         <p class="status">In Stock</p>
         <div class="price">$${(product.priceCents / 100).toFixed(2)}</div>
-        <button class="add-to-cart-btn button-primary">Add to Cart</button>
+        <div class="button-container">
+          <button class="add-to-cart-btn button-primary">Add to Cart</button>
+          <button class="purchase-btn button-secondary">Purchase Now</button>
+        </div>
       </div>
     `;
 
@@ -51,7 +54,38 @@ fetch('../js/products.json')
       localStorage.setItem('cart', JSON.stringify(cart));
 
     });
+    
+    // Add event listener for the Purchase button
+    document.querySelector('.purchase-btn').addEventListener('click', () => {
+      purchaseItem(product.id);
+    });
   }
   searchProducts(products);
 })
 .catch(error => console.error('Error loading JSON:', error));
+
+// Function to handle the purchase process
+function purchaseItem(productId) {
+  if (confirm('Are you sure you want to purchase this item?')) {
+    fetch(`/purchase/${productId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Purchase completed successfully!');
+        // Redirect to orders page or refresh the current page
+        window.location.href = '../html/orders.html';
+      } else if (data.err) {
+        alert(`Purchase failed: ${data.err}`);
+      }
+    })
+    .catch(error => {
+      console.error('Error during purchase:', error);
+      alert('An error occurred during the purchase. Please try again.');
+    });
+  }
+}
