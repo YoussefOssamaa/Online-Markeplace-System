@@ -12,6 +12,7 @@ class SignUpSchema(Schema):
     phone_number = fields.Str(required=True , validate=validate.Length(max=16))
 
 class AddSchema(Schema):
+    product_name = fields.Str(required=True)
     category_id = fields.Integer(required=True)
     description = fields.Str(required=True)
     price = fields.Float(required=True)

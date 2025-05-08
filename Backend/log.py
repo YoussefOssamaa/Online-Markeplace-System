@@ -70,48 +70,30 @@ def read_customer_last_logs(  log_type ,limit=10, offset=0 ):
 
 def read_product_last_logs(  log_type ,limit=10, offset=0 ):
     return read_last_logs(product_log_path , log_type, limit, offset)
-
-def cleanup_old_logs():
-    try:
-        path = "logs/customer_log.json"
-        # Check if file exists and is not empty
-        if not os.path.exists(path) or os.path.getsize(path) == 0:
-            print("Log file doesn't exist or is empty. Nothing to clean up.")
-            return
-            
-        try:
-            df = pd.read_json(path, lines=True)
-            # Continue with existing cleanup logic
-            paths = [customer_log_path, product_log_path]
-            one_month_ago = datetime.now() - timedelta(days=30)
-        
-            for path in paths:
-                if not os.path.isfile(path):
-                    continue
-        
-                df = pd.read_json(path, lines=True)
-        
-                if df['timestamp'].dtype == 'O':
-                    df['timestamp'] = pd.to_datetime(df['timestamp'])
-        
-                df = df[df['timestamp'] >= one_month_ago]
-        
-                df.to_json(path, orient='records', lines=True)
-        except ValueError as e:
-            print(f"Error reading log file: {str(e)}")
-            print("Attempting to fix or recreate the log file...")
-            with open(path, 'w') as f:
-                f.write('')  # Create empty file
-            print("Created new empty log file")            
-    except Exception as e:
-        print(f"Error in cleanup_old_logs: {str(e)}")
-
-def run_cleanup_every_24h():
-    def job():
-        while True:
-            cleanup_old_logs()
-            time.sleep(24 * 60 * 60)
-
-    t = threading.Thread(target=job)
-    t.daemon = True
-    t.start()
+#
+# def cleanup_old_logs():
+#     paths = [customer_log_path, product_log_path]
+#     one_month_ago = datetime.now() - timedelta(days=30)
+#
+#     for path in paths:
+#         if not os.path.isfile(path):
+#             continue
+#
+#         df = pd.read_json(path, lines=True)
+#
+#         if df['timestamp'].dtype == 'O':
+#             df['timestamp'] = pd.to_datetime(df['timestamp'])
+#
+#         df = df[df['timestamp'] >= one_month_ago]
+#
+#         df.to_json(path, orient='records', lines=True)
+#
+# def run_cleanup_every_24h():
+#     def job():
+#         while True:
+#             cleanup_old_logs()
+#             time.sleep(24 * 60 * 60)
+#
+#     t = threading.Thread(target=job)
+#     t.daemon = True
+#     t.start()
