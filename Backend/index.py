@@ -398,9 +398,6 @@ def serve_frontend_files(path):
     return send_from_directory(frontend_dir, path)
 
 
-app.run(debug = True)
-
-
 @app.route('/purchase/<int:product_id>', methods=['POST'])
 def purchase_item(product_id):
     try:
@@ -657,6 +654,8 @@ def dashboard():
     }
 
 
+
+app.run(debug = True)
 
 
 

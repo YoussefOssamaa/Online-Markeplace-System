@@ -30,7 +30,8 @@ login_button.onclick= (e)=>{
     let lPassword=document.getElementById("password").value; // The l indicates that this is the login password and username
     let lUsername=document.getElementById("username").value;
     fetch('http://127.0.0.1:5000/login', {
-        method: 'POST', 
+        method: 'POST',
+        credentials: "include", 
         headers: {
             'Content-Type': 'application/json'
         },
@@ -45,18 +46,12 @@ login_button.onclick= (e)=>{
           console.log(data);
           if(data.success) {
               // Store user data from the server response
-              const userData = data.userData || {
-                  name: lUsername,
-                  balance: 250.00,  // Default balance 
-                  purchasedItems: 0  // Default purchased items count 
-              };
-              sessionStorage.setItem('userData', JSON.stringify(userData));
-              
+              setTimeout(()=>{
+                window.location.href = './DashBoard/dashboard.html';
+              },5000)
               // Redirect to dashboard on successful login
-              window.location.href = './DashBoard/dashboard.html';
-          } else if(data.err) {
-              // Display error message to user
-              alert("Login failed: " + data.err);
+          } else if(data.err) {  
+            alert("Login failed: " + data.err);
           }
       })
       .catch(error => {

@@ -18,42 +18,39 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// Function to fetch user data from the backend
+// // Function to fetch user data from the backend
 function fetchUserData() {
-    fetch('http://127.0.0.1:5000/user/profile', {
+    fetch('http://127.0.0.1:5000//dashboard', {
         method: 'GET',
+        credentials: "include", 
         headers: {
             'Content-Type': 'application/json'
-        },
-        credentials: 'include' // Important for sending cookies/session data
-    })
+        }})
     .then(response => response.json())
     .then(data => {
         if (data.err) {
-            console.error('Error fetching user data:', data.err);
-            // If there's an error, try to use data from session storage
-            updateUserProfile();
-        } else if (data.success && data.profile) {
-            // Update session storage with fresh data
-            sessionStorage.setItem('userData', JSON.stringify(data.profile));
-            // Update the UI
-            updateUserProfile();
+            
+            if(data.err == "unauthorized"){
+                window.location.href = '../loginpage.html';
+            }else{
+                window.location.href = '../html/err_page.html';
+
+            }      
         } else {
-            // Fallback to session storage data
-            updateUserProfile();
+            console.log(data)
+            updateUserProfile(data)
         }
     })
     .catch(error => {
         console.error('Error fetching user data:', error);
-        // On error, still try to use session storage data
-        updateUserProfile();
+        window.location.href = '../html/err_page.html';
     });
 }
 
 // Function to update the user profile information
-function updateUserProfile() {
+function updateUserProfile(userData) {
     // Get user data from session storage or local storage
-    const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
+    // const userData = JSON.parse(sessionStorage.getItem('userData')) || {};
     
     // Get the elements to update
     const usernameElement = document.getElementById('username');
@@ -61,13 +58,13 @@ function updateUserProfile() {
     const purchasedItemsElement = document.getElementById('purchasedItems');
     
     // Update the elements with user data if available
-    if (usernameElement && userData.name) {
-        usernameElement.textContent = userData.name;
+    if (usernameElement && userData.username) {
+        usernameElement.textContent = userData.username;
     }
     
     if (balanceElement) {
         // Use user's balance if available, otherwise use default $250.00
-        const balance = userData.balance !== undefined ? userData.balance : 250.00;
+        const balance = userData.balance !== undefined ? userData.balance : 200.00;
         balanceElement.textContent = `$${balance.toFixed(2)}`;
     }
     

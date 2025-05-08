@@ -1,7 +1,8 @@
+const balance = document.getElementById('userBalance');
 document.addEventListener('DOMContentLoaded', function() {
     // Fetch user data when the page loads
-    fetchUserData();
-    
+    // fetchUserData();
+    check_login()
     const changePhotoButton = document.querySelector('.profile-photo button:nth-child(2)');
     const removePhotoButton = document.querySelector('.profile-photo button.remove');
     const saveChangesButton = document.querySelector('.actions button.save');
@@ -24,9 +25,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentPassword = document.getElementById('currentPassword').value;
             const newPassword = document.getElementById('newPassword').value;
             const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-            const notificationsNewMessages = document.querySelector('.notification-preferences input[type="checkbox"]:nth-child(1)').checked;
-            const notificationsOrderUpdates = document.querySelector('.notification-preferences input[type="checkbox"]:nth-child(3)').checked;
-            const marketingCommunications = document.querySelector('.notification-preferences input[type="checkbox"]:nth-child(5)').checked;
+            const first_name = document.getElementById('firstName').value;
+            const last_name = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+           
 
             // Validate password change
             if (newPassword && !currentPassword) {
@@ -38,15 +41,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('New password and confirmation do not match.');
                 return;
             }
-
-            console.log('Saving changes:', { 
-                passwordChange: newPassword ? true : false,
-                notificationsNewMessages, 
-                notificationsOrderUpdates, 
-                marketingCommunications 
-            });
+            update_account({ 
+                "first_name":first_name,
+                "last_name":last_name,
+                "email":email,
+                "current_password":currentPassword,
+                "new_password" : newPassword,
+                "confirm_password" : confirmNewPassword,
+                "phone_number":phone
+            })
             
-            alert('Account settings saved (implementation needed).');
+            
         });
     }
 
@@ -57,6 +62,69 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+function check_login(){
+    fetch('http://127.0.0.1:5000//dashboard', {
+        method: 'GET',
+        credentials: "include", 
+        headers: {
+            'Content-Type': 'application/json'
+        }})
+        .then(response => response.json())
+        .then(data => {
+        if (data.err) {
+            console.log(data.log)          
+            if(data.err == "unauthorized"){
+                window.location.href = '../loginpage.html';
+            }else{
+              window.location.href = '../html/err_page.html';
+            }      
+        } else {
+            // console.log(data)
+            balance.textContent = data.balance
+        }
+      })
+      .catch(error => {
+          window.location.href = '../html/err_page.html';
+      });
+}
+
+function update_account(new_user){
+    fetch('http://127.0.0.1:5000/account/update', {
+        method: 'POST',
+        credentials: "include", 
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "first_name":new_user.first_name,
+            "last_name":new_user.last_name,
+            "email":new_user.email,
+            "current_password":new_user.current_password,
+            "new_password" : new_user.new_password,
+            "confirm_password" : new_user.confirm_password,
+            "phone_number":new_user.phone_number
+        }) 
+    })
+      .then(response => response.json()) 
+      // In the login button onclick handler:
+      .then(data => {
+          console.log(data);
+          if(data.success) {
+
+              alert('Account settings saved (implementation needed).');
+              setTimeout(()=>{
+                window.location.href = '../DashBoard/dashboard.html';
+              },2000)
+          
+            } else if(data.err) {  
+            alert("Login failed: " + data.err);
+          }
+      })
+      .catch(error => {
+          console.error('Login error:', error);
+          alert("Login failed: Network error");
+      });
+}
 // Function to fetch user data from the backend
 function fetchUserData() {
     fetch('http://127.0.0.1:5000/user/profile', {

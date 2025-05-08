@@ -102,47 +102,47 @@ class OrderItem(db.Model):
     quantity = db.Column(db.Integer)
     price = db.Column(db.Numeric(4, 2))
 
-with app.app_context():
-    print("hello from server!")
+# with app.app_context():
+#     print("hello from server!")
     
-    if app.config['RESET_DB_ON_START']:
-        try:
-            # Check if any customers exist in the database
-            try:
-                customer_count = Customer.query.count()
-                data_exists = customer_count > 0
-            except Exception:
-                # If we can't query, assume data exists to be safe
-                data_exists = True
+#     if app.config['RESET_DB_ON_START']:
+#         try:
+#             # Check if any customers exist in the database
+#             try:
+#                 customer_count = Customer.query.count()
+#                 data_exists = customer_count > 0
+#             except Exception:
+#                 # If we can't query, assume data exists to be safe
+#                 data_exists = True
             
-            # If customers exist, drop all tables and recreate them
-            if data_exists:
-                print("Existing data found in database. Dropping all tables...")
-                # Close any existing sessions
-                db.session.close()
-                # Drop tables with more control - using proper text() function
-                from sqlalchemy import text
-                db.session.execute(text('SET CONSTRAINTS ALL DEFERRED'))
-                db.drop_all()
-                db.session.commit()
-                print("All tables dropped successfully.")
-                db.create_all()
-                print("All tables recreated successfully.")
-            else:
-                # Just create tables if they don't exist
-                db.create_all()
-                print("No existing data found. Tables created if they didn't exist.")
-        except Exception as e:
-            print(f"Error during database reset: {str(e)}")
-            # Close session to release any locks
-            db.session.close()
-            # Fallback to just creating tables
-            try:
-                db.create_all()
-                print("Tables created after error recovery.")
-            except Exception as create_error:
-                print(f"Critical database error: {str(create_error)}")
-    else:
-        # In production mode, just ensure tables exist
-        db.create_all()
-        print("Production mode: Ensuring tables exist without dropping data.")
+#             # If customers exist, drop all tables and recreate them
+#             if data_exists:
+#                 print("Existing data found in database. Dropping all tables...")
+#                 # Close any existing sessions
+#                 db.session.close()
+#                 # Drop tables with more control - using proper text() function
+#                 from sqlalchemy import text
+#                 db.session.execute(text('SET CONSTRAINTS ALL DEFERRED'))
+#                 db.drop_all()
+#                 db.session.commit()
+#                 print("All tables dropped successfully.")
+#                 db.create_all()
+#                 print("All tables recreated successfully.")
+#             else:
+#                 # Just create tables if they don't exist
+#                 db.create_all()
+#                 print("No existing data found. Tables created if they didn't exist.")
+#         except Exception as e:
+#             print(f"Error during database reset: {str(e)}")
+#             # Close session to release any locks
+#             db.session.close()
+#             # Fallback to just creating tables
+#             try:
+#                 db.create_all()
+#                 print("Tables created after error recovery.")
+#             except Exception as create_error:
+#                 print(f"Critical database error: {str(create_error)}")
+#     else:
+#         # In production mode, just ensure tables exist
+#         db.create_all()
+#         print("Production mode: Ensuring tables exist without dropping data.")
