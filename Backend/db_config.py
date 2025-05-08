@@ -22,7 +22,8 @@ class Customer(db.Model):
     phone_number = db.Column(db.String(15), unique=True)
     balance = db.Column(db.Float, default=0)
 
-    orders = db.relationship('Orders', backref='customer', lazy=True)
+    orders = db.relationship('Orders',backref='customer',lazy=True,foreign_keys='Orders.customer_id')
+    sold_orders = db.relationship('Orders',backref='seller',lazy=True,foreign_keys='Orders.seller_id')
     payments = db.relationship('Payment', backref='customer', lazy=True)
     products = db.relationship('Product', backref='customer', lazy=True)
     # cart_items = db.relationship('Cart', backref='customer', lazy=True)
@@ -38,7 +39,6 @@ class Orders(db.Model):
     order_date = db.Column(db.Date)
     total_price = db.Column(db.Numeric(5, 2))
 
-    items = db.relationship('OrderItem', backref='order', lazy=True)
 
 class Payment(db.Model):
     __tablename__ = 'Payment'

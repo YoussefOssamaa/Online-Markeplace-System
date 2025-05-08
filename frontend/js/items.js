@@ -49,21 +49,60 @@ async function fetch_products(search_text , catID) {
                   ${product.category_name}
                 </div>
                 <div class="product-quantity-container 
-                  js-product-quantity-container" data-product-id="${product.id}">
+                  js-product-quantity-container" product_id="${product.product_id}">
                     <select>
                       ${quantity_html}
                     </select>
                 </div>
                 <div class="product-spacer"></div>
                 <button class="add-to-cart-button button-primary js-add-to-cart"
-                data-product-id="${product.id}">
-                  Add to Cart
+                product_id="${product.product_id}">
+                  buy
                 </button>
               </div>
             `
         })
+        
         document.querySelector('.js-products-grid').innerHTML = productsHTML;
+        document.querySelectorAll('.js-add-to-cart').forEach((button) => {
+        button.addEventListener('click', () => {
+          const productId = button.getAttribute('product_id');
+          const selectElement = document.querySelector(`.js-product-quantity-container[product_id="${productId}"] select`);
+          const quantity = Number(selectElement.value);
+          purchase(productId , quantity)
+        })
+    })
     }).catch(error => console.error('Error loading JSON:', error));
+}
+async function purchase(product_id , quantity){
+  fetch('http://127.0.0.1:5000/purchase', {
+    method: 'POST',
+    credentials: "include", 
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        "product_id" : product_id,
+        "stock" : quantity
+    }) 
+})
+  .then(response => response.json()) 
+  // In the login button onclick handler:
+  .then(data => {
+      console.log(data);
+      if(data.success) {
+          // Store user data from the server response
+          setTimeout(()=>{
+            window.location.href = '../DashBoard/dashboard.html';
+          },2000)
+          alert(data.success)
+          // Redirect to dashboard on successful login
+      } else if(data.err) {  
+        alert( data.err);
+      }
+  })
+  .catch(error => {
+  });
 }
 fetch('http://127.0.0.1:5000/dashboard', {
   method: 'GET',
