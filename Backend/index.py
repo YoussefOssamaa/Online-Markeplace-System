@@ -21,8 +21,7 @@ admin_password = 'scrypt:32768:8:1$lgXjch7A6l3YQ6JB$9d707bb9ba371dbe323c78081645
 admin_id = 'e15912a12f0713468d1418c839a2c1f585ea1f86fc9e8f4f1705faf5cdac26a1'
 
 # CORS(app)
-CORS(app, supports_credentials=True ,origins=["http://127.0.0.1:5500"])
-# run_cleanup_every_24h()
+CORS(app, supports_credentials=True ,resources={r"/*": {"origins": "*"}})
 
 
 @app.route('/sign_up', methods=['POST'])
@@ -37,7 +36,8 @@ def sign_up():
                     Customer.phone_number == cust['phone_number']
                 )
             ).first()
-
+            if customer:
+                return {"err": "Email or phone number already exists"}, 400
             if customer is None:
                 cust['password'] = generate_password_hash(cust['password'])
 
@@ -48,6 +48,7 @@ def sign_up():
                     password=cust['password'],
                     address=cust['address'],
                     phone_number=cust['phone_number'],
+                    # balance=250.00  # Set default balance to $250.00
                 )
                 db.session.add(new_customer)
                 db.session.commit()
@@ -77,48 +78,36 @@ def sign_up():
 
 @app.route('/login', methods=['POST'])
 def login():
-    cust = request.get_json()
-    with app.app_context():
-        try:
-            # check if user exists in the db
-            if cust['username'] == admin_username and check_password_hash(admin_password, cust.get('password')):
-                session['admin'] = admin_id
-                return {"success": "welcome admin"}
-
-            customer = Customer.query.filter(
-                or_(
-                    Customer.email == cust['username'],
-                    Customer.phone_number == cust['username']
-                )
-            ).first()
-            if customer is None:
-                return {"err": "the email or phone number you entered doesn't exists "}, 400
-            else:
-                hashed_password = customer.password
-                # In the login function, modify the successful login response:
-                if check_password_hash(hashed_password, cust.get('password')):
-                    # Count purchased items
-
-                    # Create response with user data
-                    resp = make_response({
-                        "success": "you logged in sucessfully"
-                    })
-
-                    session['online_market_id'] = customer.customer_id
-                    session['online_market_email'] = customer.email
-
-                    log_customer("login", customer.customer_id, "")
-                    return resp
-                else:
-                    return {"err": "password is wrong"}, 400
-
-        except (IntegrityError, DataError) as e:
-            return {"err": "the email or phone number you entered doesn't exist"}, 400
-
-        except (OperationalError, Exception) as e:
-            # return {"err": "internal server error"}, 500
-            return {"err": str(e)}, 500
-
+    try:
+        cust = request.get_json()
+        if cust.get('email') == admin_username and check_password_hash(admin_password, cust.get('password')):
+            session['admin'] = admin_id
+            return {"success": "Welcome admin"}
+        customer = Customer.query.filter(
+            or_(
+                Customer.email == cust.get('email'),
+                Customer.phone_number == cust.get('email')
+            )
+        ).first()
+        if not customer:
+            return {"err": "Email or phone number not found"}, 400
+        if not check_password_hash(customer.password, cust.get('password')):
+            return {"err": "Incorrect password"}, 400
+        session['online_market_id'] = customer.customer_id
+        session['online_market_email'] = customer.email
+        log_customer("login", customer.customer_id, "")
+        return {
+            "success": "Logged in successfully",
+            "userData": {
+                "name": f"{customer.first_name} {customer.last_name}",
+                "balance": float(customer.balance)
+            }
+        }
+    except DataError:
+        return {"err": "Invalid data format"}, 400
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        return {"err": "Internal server error"}, 500
 
 @app.route('/logout', methods=['POST'])
 def logout():
@@ -166,7 +155,7 @@ def add_item():
 
 
 @app.route('/item', methods=['GET'])
-def get_my_items():
+def get_myitems():
     try:
         if 'online_market_id' in session and 'online_market_email' in session:
             cust = Customer.query.filter(
@@ -179,16 +168,7 @@ def get_my_items():
             else:
                 offset = request.args.get('offset', default=0, type=int)
                 limit = request.args.get('limit', default=10, type=int)
-                items_type = request.args.get('type', default="")
-                products = []
-                if items_type == "purchased":
-                    products = db.session.query(Product).join(Orders).filter(
-                        Orders.customer_id == cust.customer_id).offset(offset).limit(limit).all()
-                elif  items_type == "sold" :
-                    products = db.session.query(Product).join(Orders).filter(
-                        Orders.seller_id == cust.customer_id).offset(offset).limit(limit).all()
-                else:
-                    products = Product.query.filter_by(customer_id=cust.customer_id).offset(offset).limit(limit).all()
+                products = Product.query.filter_by(customer_id=cust.customer_id).offset(offset).limit(limit).all()
                 products_data = []
                 for prod in products:
                     products_data.append({
@@ -215,7 +195,7 @@ def get_my_items():
         return {"err": "internal server error"}, 500
 
 
-@app.route('/item/edit', methods=['GET'])
+@app.route('/item/edit', methods=['POST'])
 def edit_item():
     try:
         if 'online_market_id' in session and 'online_market_email' in session:
@@ -226,25 +206,28 @@ def edit_item():
             if (cust is None):
                 session.clear()
                 return {"err": "you are not authorized"}, 402
-            else:
+            
+            product_data = request.get_json()
+            if not product_data or 'product_id' not in product_data:
+                return {"err": "invalid request data"}, 400
 
-                product = request.get_json()
-                new_product = Product.query.get(product["product_id"])  # أو .filter_by(product_id=0).first()
+            new_product = Product.query.get(product_data["product_id"])
+            if not new_product:
+                return {"err": "product not found"}, 404
 
-                if new_product.customer_id == cust.customer_id:
+            if new_product.customer_id == cust.customer_id:
                     log_product("update", cust.customer_id, new_product.product_id,
-                                "previous price = " + str(new_product.price) + "new price = "
-                                + str(product["price"]))
-                    new_product.price = product["price"]
-                    new_product.description = product["description"]
+                                f"previous price = {new_product.price}, new price = {product_data.get('price')}")
+                    new_product.price = product_data.get("price", new_product.price)
+                    new_product.description = product_data.get("description", new_product.description)
                     # new_product.stock = product["stock"]
                     # new_product.SKU = product["SKU"]
                     # new_product.category_id = product["category_id"]
                     db.session.commit()
 
                     return {"success": "the product is edited successfully"}
-                else:
-                    return {"err": "this is not your product"}, 404
+            else:
+                    return {"err": "this is not your product"}, 403
         else:
             return {"err": "you are not authorized"}, 402
     except ValidationError as err:
@@ -253,8 +236,7 @@ def edit_item():
     except (IntegrityError, DataError) as e:
         return {"err": "the data you entered is wrong format"}, 400
     except Exception as e:
-        return {"err": "internal server error"}, 500
-
+        return {"err": f"internal server error: {str(e)}"}, 500
 
 @app.route('/item/search', methods=['GET'])
 def search_item():
@@ -426,92 +408,100 @@ def get_order_report():
             return {"err": "you are not authorized"}, 402
     except Exception as e:
         return {"err": "internal server error"}, 500
+#
+# @app.route('/purchase/<int:product_id>', methods=['POST'])
+# def purchase_item(product_id):
+#     try:
+#         if 'online_market_id' in session and 'online_market_email' in session:
+#             buyer = Customer.query.filter(
+#                 Customer.email == session['online_market_email'],
+#             ).first()
+#
+#             if buyer is None:
+#                 session.clear()
+#                 return {"err": "you are not authorized"}, 402
+#
+#             # Get the product
+#             product = Product.query.get(product_id)
+#             if product is None:
+#                 return {"err": "Product not found"}, 404
+#
+#             # Check if user is trying to buy their own product
+#             if product.customer_id == buyer.customer_id:
+#                 return {"err": "You cannot purchase your own product"}, 400
+#
+#             # Get the seller
+#             seller = Customer.query.get(product.customer_id)
+#             if seller is None:
+#                 return {"err": "Seller not found"}, 404
+#
+#             # Check if product is in stock
+#             if product.stock <= 0:
+#                 return {"err": "Product is out of stock"}, 400
+#
+#             # Check if buyer has enough balance
+#             price = float(product.price)
+#             if buyer.balance < price:
+#                 return {"err": "Insufficient balance"}, 400
+#
+#             # Create a new order
+#             from datetime import date
+#             new_order = Orders(
+#                 customer_id=buyer.customer_id,
+#                 order_date=date.today(),
+#                 total_price=price
+#             )
+#             db.session.add(new_order)
+#             db.session.flush()  # Get the order ID without committing
+#
+#             # Create order item
+#             order_item = OrderItem(
+#                 order_id=new_order.order_id,
+#                 product_id=product.product_id,
+#                 quantity=1,
+#                 price=price
+#             )
+#             db.session.add(order_item)
+#
+#             # Create payment record
+#             payment = Payment(
+#                 customer_id=buyer.customer_id,
+#                 order_id=new_order.order_id,
+#                 payment_date=date.today(),
+#                 payment_method="Account Balance",
+#                 amount=price
+#             )
+#             db.session.add(payment)
+#
+#             # Transfer money from buyer to seller
+#             buyer.balance -= price
+#             seller.balance += price
+#
+#             # Transfer ownership of the product
+#             product.customer_id = buyer.customer_id
+#
+#             # Decrement stock
+#             product.stock -= 1
+#
+#             # Log the transaction
+#             log_customer("purchase", buyer.customer_id, f"Purchased product {product_id} for {price}")
+#             log_customer("sale", seller.customer_id, f"Sold product {product_id} for {price}")
+#
+#             # Commit all changes
+#             db.session.commit()
+#
+#             return {"success": "Purchase completed successfully"}
+#         else:
+#             return {"err": "you are not authorized"}, 402
+#
+#     except (IntegrityError, DataError) as e:
+#         db.session.rollback()
+#         return {"err": "Data error occurred"}, 400
+#     except Exception as e:
+#         db.session.rollback()
+#         return {"err": f"Internal server error: {str(e)}"}, 500
 
-@app.route('/purchase', methods=['POST'])
-def purchase_item():
-    try:
-        if 'online_market_id' in session and 'online_market_email' in session:
-            buyer = Customer.query.filter(
-                Customer.email == session['online_market_email'],
-            ).first()
-            data = request.get_json()
-            product_id = int(data['product_id'])
-            stock = int(data['stock'])
-            if buyer is None:
-                session.clear()
-                return {"err": "you are not authorized"}, 402
-
-            # Get the product
-            product = Product.query.get(product_id)
-            if product is None:
-                return {"err": "Product not found"}, 404
-
-            # Check if user is trying to buy their own product
-            if product.customer_id == buyer.customer_id:
-                return {"err": "You cannot purchase your own product"}, 400
-
-            # Get the seller
-            seller = Customer.query.get(product.customer_id)
-            if seller is None:
-                return {"err": "Seller not found"}, 404
-
-            # Check if product is in stock
-            if product.stock <= 0:
-                return {"err": "Product is out of stock"}, 400
-
-            # Check if buyer has enough balance
-            price = float(product.price)
-            if buyer.balance < (price*stock):
-                return {"err": "Insufficient balance"}, 400
-
-            # Create a new order
-            new_row = Product(
-                product_name=product.product_name,
-                category_id=product.category_id,
-                SKU=product.SKU,
-                description=product.description,
-                price=product.price,
-                stock=stock,
-                customer_id=buyer.customer_id
-            )
-            product.stock -= stock
-            if product.stock == 0:
-                product_to_delete = Product.query.get(product_id)
-                db.session.delete(product_to_delete)
-                db.session.flush()
-            db.session.add(new_row)
-            db.session.flush()
-            # Transfer money from buyer to seller
-            buyer.balance -= price * stock
-            seller.balance += price * stock
-
-            from datetime import date
-            new_order = Orders(
-                seller_id = seller.customer_id,
-                customer_id=buyer.customer_id,
-                order_date=date.today(),
-                total_price=price * stock,
-                product_id = new_row.product_id,
-                quantity = stock
-            )
-            db.session.add(new_order)
-            db.session.flush()  # Get the order ID without committing
-
-            # Commit all changes
-            db.session.commit()
-
-            return {"success": "Purchase completed successfully"}
-        else:
-            return {"err": "you are not authorized"}, 402
-
-    except (IntegrityError, DataError) as e:
-        db.session.rollback()
-        return {"err": "Data error occurred"}, 400
-    except Exception as e:
-        db.session.rollback()
-        return {"err": f"Internal server error: {str(e)}"}, 500
-
-
+#
 # @app.route('/user/profile', methods=['GET'])
 # def get_user_profile():
 #     try:
