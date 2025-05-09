@@ -4,36 +4,38 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Marketplace categories</title>
-     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
- 
-     
-     <link rel="stylesheet" href="../css/general.css">
-     <link rel="stylesheet" href="../css/site-header.css">
-     <link rel="stylesheet" href="../css/site.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/general.css">
+  <link rel="stylesheet" href="../css/site-header.css">
+  <link rel="stylesheet" href="../css/site.css">
+  <style>
+    body {
+      font-family: 'Poppins', 'Roboto', Arial, sans-serif;
+    }
+  </style>
 </head>
 <body>
   <div class="site-header">
     <div class="site-header-left-section">
       <a href="categories.html" class="header-link">
         <img class="site-logo"
-          src="../images/site_logo_white.png">
+          src="../images/site_logo_white.png"
+          alt="Marketplace Logo">
       </a>
     </div>
-
     <div class="site-header-middle-section">
-      <input class="search-bar" id="searchInput" type="text" placeholder="Search">
+      <input class="search-bar" id="searchInput" type="text" placeholder="Search" autofocus>
       <div id="searchResults" class="search-dropdown"></div>
-      <button class="search-button" id = "searchButton">
-        <img class="search-icon" src="../images/search-icon.png">
+      <button class="search-button" id="searchButton" aria-label="Search">
+        <img class="search-icon" src="../images/search-icon.png" alt="Search">
       </button>
     </div>
-
     <div class="site-header-right-section">
       <div class="profile-menu">
         <div class="profile-button">
-          <img src="../images/profile-pic.jpg">
+          <img src="../images/profile-pic.jpg" alt="Profile Picture">
           <span class="arrow">▼</span>
         </div>
         <div class="dropdown">
@@ -43,17 +45,16 @@
         </div>
       </div>
       <a class="cart-link header-link" href="checkout.html">
-        <img class="cart-icon" src="../images/cart-icon.png">
+        <img class="cart-icon" src="../images/cart-icon.png" alt="Cart">
         <div class="cart-quantity js-cart-quantity">0</div>
         <div class="cart-text">Cart</div>
       </a>
-      
     </div>
   </div>
-  <div class="main">
+  <main class="main">
     <div class="Category-grid js-Category-grid">
     </div>
-  </div>
+  </main>
   <script src="../js/search.js"></script>
   <script src="../js/categories.js"></script>
 </body>
