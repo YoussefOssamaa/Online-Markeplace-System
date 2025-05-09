@@ -1,33 +1,243 @@
 <!DOCTYPE html>
-<html>
-    <title>
-        Online MP Sign up page 
-    </title>
+<html lang="en">
+<head>
+    <title>Online Marketplace - Sign Up</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sign up page for the Online Marketplace.">
+    <link rel="stylesheet" href="css/site.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7f9fc;
+            color: #4a4a4a;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .content-wrapper {
+            max-width: 520px;
+            margin: 40px auto;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-container img {
+            max-width: 160px;
+            margin-bottom: 18px;
+            transition: transform 0.3s ease;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .logo-container h1 {
+            color: #2d3748;
+            font-size: 28px;
+            font-weight: 600;
+            margin: 0;
+            text-align: center;
+            letter-spacing: -0.5px;
+            display: block;
+            width: 100%;
+        }
+
+        .logo-container h1:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            background-color: #38a169;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #4a5568;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: 'Roboto', sans-serif;
+            transition: all 0.3s ease;
+            color: #2d3748;
+        }
+
+        .form-group input:focus {
+            border-color: #38a169;
+            box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.15);
+            outline: none;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #718096;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .signup-button {
+            width: 100%;
+            padding: 14px;
+            background-color: #38a169;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.3px;
+        }
+
+        .signup-button:hover {
+            background-color: #2f855a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(56, 161, 105, 0.2);
+        }
+
+        .signup-button:active {
+            transform: translateY(0);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 15px;
+            color: #718096;
+        }
+
+        .login-link a {
+            color: #38a169;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        ::placeholder {
+            color: #a0aec0;
+            opacity: 1;
+        }
+    </style>
     <script src="interface_for_signup.js" defer></script>
-    <body>
-        <img src="online_marketplaceico.bmp" height="400" width="600">
-        <h1 id="signuptitle"><u>Sign up</u></h1>
-        <form>
-        <h2 id="signupelements">
-            Enter Firstname: <br> 
-            <input id ="SUusername" required minlength="1"> 
-            <br>Create Password:<br>
-            <input id ="SUpassword" required minlength="1">
-            <br>Create Email<br> 
-            <input type="email" id="SUemail" required minlength="1"> 
-            <br>Enter Lastname<br>
-            <input id="SUlastname" required minlength="1">
-            <br>Enter address<br>
-            <input id="SUaddress" required minlength="1">
-            <br>Enter phone no.<br>
-            <input id="SUphonenumber" required minlength="1">
-            <button type="submit" id="signupbutton">
-                Register
-            </button>
-            <!-- All usernames, passwords etc. 
-            have SU before them to indicate that this is 
-            the Sign Up password/username etc. -->
-        </h2>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="logo-container">
+            <img src="online_marketplaceico.bmp" alt="Marketplace Logo">
+            <h1>Create Account</h1>
+        </div>
+        
+        <form id="signupForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="SUusername">First Name</label>
+                    <input type="text" id="SUusername" required minlength="1">
+                </div>
+                <div class="form-group">
+                    <label for="SUlastname">Last Name</label>
+                    <input type="text" id="SUlastname" required minlength="1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="SUemail">Email</label>
+                <input type="email" id="SUemail" required minlength="1">
+            </div>
+            
+            <div class="form-group">
+                <label for="SUpassword">Create Password</label>
+                <div class="password-container">
+                    <input type="password" id="SUpassword" required minlength="6">
+                    <button type="button" class="password-toggle" aria-label="Toggle password visibility">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="SUaddress">Address</label>
+                <input type="text" id="SUaddress" required minlength="1">
+            </div>
+            
+            <div class="form-group">
+                <label for="SUphonenumber">Phone Number</label>
+                <input type="tel" id="SUphonenumber" required minlength="1">
+            </div>
+            
+            <button type="submit" id="signupbutton" class="signup-button">Register</button>
+            
+            <div class="login-link">
+                Already have an account? <a href="loginpage.html">Sign In</a>
+            </div>
         </form>
-    </body>
+    </div>
+
+    <script>
+        document.querySelector('.password-toggle').addEventListener('click', function() {
+            const passwordInput = document.getElementById('SUpassword');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    </script>
+</body>
 </html>
