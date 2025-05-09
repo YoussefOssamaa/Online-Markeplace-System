@@ -3,12 +3,16 @@ let purchased_items = [];
 let sold_items = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-
     check_login();
 
     const itemsContainer = document.getElementById("itemsList");
     const sold_itemsContainer = document.getElementById("sold_items_list");
     const purchased_itemsContainer = document.getElementById("purchased_items_list");
+    
+    // Get loading indicator elements
+    const itemsLoading = document.getElementById("itemsLoading");
+    const purchasedItemsLoading = document.getElementById("purchased_items_loading");
+    const soldItemsLoading = document.getElementById("sold_items_loading");
 
     // Fetch all items
     fetch('http://127.0.0.1:5000/item', {
@@ -20,6 +24,9 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then(response => response.json())
     .then(data => {
+        // Hide loading indicator
+        if (itemsLoading) itemsLoading.style.display = 'none';
+        
         if (data.err) {
             console.log(data.log);
             if (data.err === "unauthorized") {
@@ -34,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (items.length === 0) {
                 itemsContainer.innerHTML = `
-                    <p class="no-items-msg">No items found. Add some now!.</p>
+                    <p class="no-items-msg">No items found. Add some now!</p>
                 `;
                 return;
             }
@@ -53,7 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     })
     .catch(error => {
-        window.location.href = '../html/err_page.html';
+        if (itemsLoading) itemsLoading.style.display = 'none';
+        itemsContainer.innerHTML = `<p class="no-items-msg">Error loading items. Please try again.</p>`;
+        console.error("Error fetching items:", error);
     });
 
     // Fetch sold items
@@ -66,6 +75,9 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then(response => response.json())
     .then(data => {
+        // Hide loading indicator
+        if (soldItemsLoading) soldItemsLoading.style.display = 'none';
+        
         if (data.err) {
             console.log(data.log);
             if (data.err === "unauthorized") {
@@ -97,7 +109,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     })
     .catch(error => {
-        window.location.href = '../html/err_page.html';
+        if (soldItemsLoading) soldItemsLoading.style.display = 'none';
+        sold_itemsContainer.innerHTML = `<p class="no-items-msg">Error loading sold items. Please try again.</p>`;
+        console.error("Error fetching sold items:", error);
     });
 
     // Fetch purchased items
@@ -110,6 +124,9 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then(response => response.json())
     .then(data => {
+        // Hide loading indicator
+        if (purchasedItemsLoading) purchasedItemsLoading.style.display = 'none';
+        
         if (data.err) {
             if (data.err === "unauthorized") {
                 window.location.href = '../loginpage.html';
@@ -140,7 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     })
     .catch(error => {
-        window.location.href = '../html/err_page.html';
+        if (purchasedItemsLoading) purchasedItemsLoading.style.display = 'none';
+        purchased_itemsContainer.innerHTML = `<p class="no-items-msg">Error loading purchased items. Please try again.</p>`;
+        console.error("Error fetching purchased items:", error);
     });
 });
 
