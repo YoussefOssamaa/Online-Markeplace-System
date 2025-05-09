@@ -47,9 +47,8 @@ login_button.onclick = (e) => {
     .then(data => {
         console.log(data);
         if (data.success) {
-            alert("Login successful! Redirecting to dashboard...");
-            // Use absolute path to ensure correct redirect
-            window.location.href = '/DashBoard/dashboard.html';
+
+            window.location.href = 'DashBoard/dashboard.html';
         }
     })
     .catch(error => {

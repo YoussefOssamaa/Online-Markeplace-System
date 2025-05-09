@@ -33,7 +33,6 @@ signup_button.onclick=(e)=>
         .then(data => {
             console.log(data);
             if(data.success) {
-                alert("Account created successfully! Please login.");
                 window.location.href = 'loginpage.html';
             } else if(data.err) {
                 alert("Signup failed: " + (typeof data.err === 'object' ? JSON.stringify(data.err) : data.err));
