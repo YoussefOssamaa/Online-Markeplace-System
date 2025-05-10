@@ -4,48 +4,206 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Edit Item</title>
-  <script src=
-      "https://cdn.jsdelivr.net/npm/sweetalert2@11">
-  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link rel="stylesheet" href="edit-item-styles.css" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f7f9fc;
+      color: #4a4a4a;
+      line-height: 1.6;
+    }
+    
+    .edit-container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    h1 {
+      color: #2d3748;
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+    
+    form {
+      display: grid;
+      gap: 18px;
+    }
+    
+    label {
+      font-weight: 500;
+      color: #4a5568;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      display: block;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 16px;
+      font-family: 'Roboto', sans-serif;
+      transition: all 0.3s ease;
+    }
+    
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    input:focus, textarea:focus {
+      border-color: #3182ce;
+      box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+      outline: none;
+    }
+    
+    button[type="submit"] {
+      background-color: #d69e2e; /* Amber color for editing */
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    button[type="submit"]:hover {
+      background-color: #b7791f; /* Darker amber on hover */
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(49, 130, 206, 0.2);
+    }
+
+    button[type="submit"]:active {
+      transform: translateY(0);
+    }
+    
+    .custom-alert {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .custom-alert-box {
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      border-left: 4px solid #38a169;
+    }
+    
+    .custom-alert-box h2 {
+      color: #38a169;
+      margin-top: 0;
+    }
+    
+    .custom-alert-box button {
+      background-color: #3182ce;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      margin-top: 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .hidden {
+      display: none;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #3182ce;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Add required field indicators for consistency */
+    .required-field::after {
+      content: " *";
+      color: #e53e3e;
+    }
+    
+    /* Add error messages for validation consistency */
+    .error-message {
+      color: #e53e3e;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+    
+    /* Group form elements consistently */
+    .form-group {
+      margin-bottom: 18px;
+    }
+  </style>
 </head>
 <body>
   <div class="edit-container">
     <h1>Edit Product</h1>
-    <form id="editForm">
-      <label for="name">New Name:</label>
-      <input type="text" id="name" required />
+    <form id="editForm" autocomplete="off">
+      <div class="form-group">
+        <label for="name" class="required-field">Product Name</label>
+        <input type="text" id="name" required placeholder="Enter product name" aria-describedby="nameError" autofocus />
+        <div id="nameError" class="error-message"></div>
+      </div>
 
-      <label for="desc">New Description:</label>
-      <textarea id="desc" required></textarea>
+      <div class="form-group">
+        <label for="desc" class="required-field">Product Description</label>
+        <textarea id="desc" required placeholder="Enter product description" aria-describedby="descError"></textarea>
+        <div id="descError" class="error-message"></div>
+      </div>
 
-      <label for="price">New Price:</label>
-      <input type="number" id="price" min="0" step="0.01" required />
+      <div class="form-group">
+        <label for="price" class="required-field">Price ($)</label>
+        <input type="number" id="price" min="0.01" step="0.01" required placeholder="0.00" aria-describedby="priceError" />
+        <div id="priceError" class="error-message"></div>
+      </div>
 
       <button type="submit">Update Item</button>
     </form>
 
-    <div id="customAlert" class="custom-alert hidden">
+    <a href="myProducts.html" class="back-link">← Back to My Products</a>
+
+    <div id="customAlert" class="custom-alert hidden" aria-live="polite">
       <div class="custom-alert-box">
         <h2>Updated</h2>
         <p id="customAlertMessage">This is the message.</p>
-        <button id="alertOkBtn">OK</button>
+        <button id="alertOkBtn" type="button">OK</button>
       </div>
     </div>
-    
-
   </div>
 
   <script src="editItem.js"></script>
-  <!-- <script>
-    function showCustomAlert() {
-        // Create a custom alert box with SweetAlert
-        Swal.fire({
-            title: 'Update Confirmed',
-            text: 'The item has been updated successfully!',
-            confirmButtonText: 'OK'
-        });
-    }
-</script> -->
 </body>
 </html>
