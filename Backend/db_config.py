@@ -85,6 +85,9 @@ class Product(db.Model):
     order_items = db.relationship('OrderItem', backref='product', lazy=True, viewonly=True)
     cart_items = db.relationship('Cart', backref='product', lazy=True, viewonly=True)
 
+    # Add new field is_active to Product model
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+
 
 class Cart(db.Model):
     __tablename__ = 'cart'

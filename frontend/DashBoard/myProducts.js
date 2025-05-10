@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p class="price">Quantity: ${item.stock}</p>
                     <div class="product-actions">
                         <button class="edit-btn" data-id="${item.product_id}">Edit</button>
+                        <button class="remove-btn" data-id="${item.product_id}">Remove</button>
                     </div>
                 `;
                 itemsContainer.appendChild(card);
@@ -63,6 +64,36 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Add event listener to the edit button
                 const editBtn = card.querySelector('.edit-btn');
                 editBtn.addEventListener('click', () => openEditModal(item));
+
+                // Add event listener to the remove button
+                const removeBtn = card.querySelector('.remove-btn');
+                removeBtn.addEventListener('click', () => {
+                    if (confirm('Are you sure you want to remove this item from the marketplace?')) {
+                        fetch('http://127.0.0.1:5000/item/remove', {
+                            method: 'POST',
+                            credentials: "include",
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                product_id: item.product_id
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Item removed successfully');
+                                location.reload(); // Refresh the page to update the list
+                            } else {
+                                alert(data.err || 'Failed to remove item');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while removing the item');
+                        });
+                    }
+                });
             });
         }
     })

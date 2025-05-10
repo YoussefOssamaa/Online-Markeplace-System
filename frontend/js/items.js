@@ -78,35 +78,34 @@ async function fetch_products(search_text , catID) {
     }).catch(error => console.error('Error loading JSON:', error));
 }
 async function purchase(product_id, quantity){
-  fetch('http://127.0.0.1:5000/purchase', {
-    method: 'POST',
-    credentials: "include", 
-    headers: {
+  try {
+    const response = await fetch('http://127.0.0.1:5000/purchase', {
+      method: 'POST',
+      credentials: "include", 
+      headers: {
         'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        "product_id" : product_id,
-        "stock" : quantity
-    }) 
-  })
-  .then(response => response.json()) 
-  .then(data => {
-      console.log(data);
-      if(data.success) {
-          // Store user data from the server response
-          setTimeout(()=>{
-            window.location.href = '../DashBoard/dashboard.html';
-          },2000)
-          alert(data.success)
-          // Redirect to dashboard on successful login
-      } else if(data.err) {  
-        alert(data.err);
-      }
-  })
-  .catch(error => {
-    alert('An error occurred during purchase. Please try again.');
+      },
+      body: JSON.stringify({
+        "product_id": product_id,
+        "stock": quantity
+      }) 
+    });
+    
+    const data = await response.json();
+    console.log('Purchase response:', data);
+    
+    if (data.success) {
+      alert(data.success);
+      setTimeout(() => {
+        window.location.href = '../DashBoard/dashboard.html';
+      }, 2000);
+    } else if (data.err) {
+      alert(data.err);
+    }
+  } catch (error) {
     console.error('Purchase error:', error);
-  });
+    alert('An error occurred during purchase. Please try again.');
+  }
 }
 fetch('http://127.0.0.1:5000/dashboard', {
   method: 'GET',

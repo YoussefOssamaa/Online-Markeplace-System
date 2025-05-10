@@ -41,3 +41,14 @@
 {"timestamp": "2025-05-10T11:00:45.405949", "event_type": "login", "description": "", "customer_id": 3}
 {"timestamp": "2025-05-10T11:01:55.884998", "event_type": "login", "description": "", "customer_id": 4}
 {"timestamp": "2025-05-10T11:23:37.820232", "event_type": "login", "description": "", "customer_id": 3}
+{"timestamp": "2025-05-10T18:31:25.140183", "event_type": "create", "description": "", "customer_id": 1}
+{"timestamp": "2025-05-10T18:31:27.313303", "event_type": "login", "description": "", "customer_id": 1}
+{"timestamp": "2025-05-10T18:32:11.024866", "event_type": "login", "description": "", "customer_id": 1}
+{"timestamp": "2025-05-10T19:06:53.684090", "event_type": "create", "description": "", "customer_id": 2}
+{"timestamp": "2025-05-10T19:07:00.259095", "event_type": "login", "description": "", "customer_id": 2}
+{"timestamp": "2025-05-10T19:08:20.633235", "event_type": "login", "description": "", "customer_id": 1}
+{"timestamp": "2025-05-10T19:10:34.868408", "event_type": "login", "description": "", "customer_id": 1}
+{"timestamp": "2025-05-10T19:12:43.910319", "event_type": "login", "description": "", "customer_id": 2}
+{"timestamp": "2025-05-10T19:16:11.606302", "event_type": "login", "description": "", "customer_id": 2}
+{"timestamp": "2025-05-10T19:19:37.917320", "event_type": "login", "description": "", "customer_id": 1}
+{"timestamp": "2025-05-10T19:20:08.599616", "event_type": "login", "description": "", "customer_id": 2}

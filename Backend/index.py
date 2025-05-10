@@ -132,12 +132,14 @@ def add_item():
                 session.clear()
                 return {"err": "you are not authorized"}, 402
             else:
-
                 product = validate_item.load(request.get_json())
                 product["customer_id"] = cust.customer_id
-                category = Category.query.get(product['category_id'])
+                category_id = product['category_id']
+                print(f"Received category_id: {category_id}")
+                category = Category.query.get(category_id)
+                print(f"Category query result: {category}")
                 if not category:
-                    return {"err": "the category you extered doesn't exist"}, 400
+                    return {"err": "the category you entered doesn't exist"}, 400
 
                 new_product = Product(**product)
 
@@ -175,7 +177,7 @@ def get_myitems():
                 
                 # Default behavior - return items for sale by the current user
                 if item_type is None:
-                    products = Product.query.filter_by(customer_id=cust.customer_id).offset(offset).limit(limit).all()
+                    products = Product.query.filter_by(customer_id=cust.customer_id, is_active=True).offset(offset).limit(limit).all()
                     products_data = []
                     for prod in products:
                         products_data.append({
@@ -237,7 +239,7 @@ def get_myitems():
                     # Get products that the user has sold with the actual sold quantity
                     sold_items = db.session.query(
                         Product,
-                        Orders.quantity,
+                        db.func.sum(Orders.quantity).label('sold_quantity'),
                         Orders.order_date,
                         Orders.total_price
                     ).join(
@@ -245,12 +247,12 @@ def get_myitems():
                     ).filter(
                         Orders.seller_id == cust.customer_id,
                         Orders.customer_id != cust.customer_id
-                    ).offset(offset).limit(limit).all()
+                    ).group_by(Product.product_id, Orders.order_date, Orders.total_price).offset(offset).limit(limit).all()
                     
                     products_data = []
                     for item in sold_items:
                         prod = item[0]  # Product object
-                        sold_quantity = item[1]  # Quantity from Orders
+                        sold_quantity = item[1]  # Sum of quantities from Orders
                         order_date = item[2]  # Order date
                         total_price = item[3]  # Total price of the order
                         
@@ -262,9 +264,26 @@ def get_myitems():
                             "SKU": prod.SKU,
                             "description": prod.description,
                             "price": prod.price,
-                            "stock": sold_quantity,  # Use the sold quantity instead of current stock
+                            "stock": sold_quantity,  # Use the summed sold quantity
                             "order_date": order_date.strftime('%Y-%m-%d') if order_date else None,
                             "total_price": float(total_price) if total_price else float(prod.price) * sold_quantity
+                        })
+                    return {"products": products_data}
+                
+                # Return my products
+                elif item_type == 'my':
+                    products = Product.query.filter_by(customer_id=cust.customer_id, is_active=True).offset(offset).limit(limit).all()
+                    products_data = []
+                    for prod in products:
+                        products_data.append({
+                            "product_id": prod.product_id,
+                            "category_id": prod.category_id,
+                            "product_name": prod.product_name,
+                            "category_name": prod.category.name,
+                            "SKU": prod.SKU,
+                            "description": prod.description,
+                            "price": prod.price,
+                            "stock": prod.stock
                         })
                     return {"products": products_data}
                 
@@ -359,6 +378,8 @@ def search_item():
                     query = query.filter(Product.product_name.ilike(f'%{search}%'))
                 if category_id != -1:
                     query = query.filter(Product.category_id == category_id)
+                # Filter out removed products
+                query = query.filter(Product.is_active == True)
                 
                 products = query.offset(offset).limit(limit).all()
                 products_data = []
@@ -712,7 +733,8 @@ def initialize_categories():
     
     categories = [
         {"name": "Electronics"},
-        {"name": "Clothes"}
+        {"name": "Clothes"},
+        {"name": "Accessories"}
     ]
     
     with app.app_context():
@@ -724,6 +746,39 @@ def initialize_categories():
         
         db.session.commit()
         return {"message": "Categories initialized successfully"}
+
+
+@app.route('/item/remove', methods=['POST'])
+def remove_item():
+    try:
+        if 'online_market_id' in session and 'online_market_email' in session:
+            cust = Customer.query.filter(
+                Customer.email == session['online_market_email'],
+            ).first()
+
+            if cust is None:
+                session.clear()
+                return {"err": "you are not authorized"}, 402
+
+            product_data = request.get_json()
+            if not product_data or 'product_id' not in product_data:
+                return {"err": "invalid request data"}, 400
+
+            product = Product.query.get(product_data["product_id"])
+            if not product:
+                return {"err": "product not found"}, 404
+
+            if product.customer_id == cust.customer_id:
+                product.is_active = False
+                log_product("remove", cust.customer_id, product.product_id, "Product removed from marketplace")
+                db.session.commit()
+                return {"success": "the product is removed from marketplace successfully"}
+            else:
+                return {"err": "this is not your product"}, 403
+        else:
+            return {"err": "you are not authorized"}, 402
+    except Exception as e:
+        return {"err": f"Internal server error: {str(e)}"}, 500
 
 
 app.run(debug=True)

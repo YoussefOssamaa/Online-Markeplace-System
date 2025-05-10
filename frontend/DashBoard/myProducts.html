@@ -33,45 +33,58 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             padding: 20px;
             margin-bottom: 25px;
+            min-width: 100%;
         }
         
         .inside-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .inside-header h1 {
             color: #2d3748;
             font-weight: 600;
             margin: 0;
+            font-size: 1.5rem;
         }
         
         .products-report-btn, .items-for-sale-btn {
-            background-color: #4299e1; /* Slightly lighter blue for better visual appeal */
+            background-color: #4299e1;
             color: white;
             border: none;
             border-radius: 6px;
-            padding: 12px 22px; /* Slightly more padding for better touch targets */
+            padding: 10px 15px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
             font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
         }
         
         .items-for-sale-btn {
-            background-color: #38a169; /* Green for action button to distinguish it */
+            background-color: #38a169;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+            height: 40px;
+        }
+        
+        .items-for-sale-btn i {
+            margin-right: 5px;
         }
         
         .products-report-btn:hover, .items-for-sale-btn:hover {
-            background-color: #2b6cb0; /* Darker on hover */
+            background-color: #2b6cb0;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(49, 130, 206, 0.2);
         }
         
         .items-for-sale-btn:hover {
-            background-color: #2f855a; /* Darker green on hover */
-            box-shadow: 0 4px 12px rgba(56, 161, 105, 0.2); /* Green shadow */
+            background-color: #2f855a;
+            box-shadow: 0 4px 12px rgba(56, 161, 105, 0.2);
         }
         
         .items-for-sale-container {
@@ -81,13 +94,15 @@
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            padding: 20px;
+            padding: 15px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         
         .items-for-sale-container h2 {
             margin: 0;
             color: #2d3748;
+            font-size: 1.2rem;
         }
         
         .itemsQuantity {
@@ -108,7 +123,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             padding: 20px;
             transition: all 0.3s ease;
-            border-left: 4px solid #4299e1; /* Adding a colored accent border */
+            border-left: 4px solid #4299e1;
         }
         
         .product-card:hover {
@@ -213,9 +228,6 @@
                         </button>
                     </a>
                 </nav>
-                <a href="productsReport.html">  <!-- Removed target="_blank" -->
-                    <button class="products-report-btn">View Products Report</button>
-                </a>
             </div>
         </header>
         
@@ -227,7 +239,7 @@
                     </div>
                     <a href="addItem.html" aria-label="Add new items">
                         <button class="items-for-sale-btn">
-                            <i class="fa fa-plus" aria-hidden="true"></i> Add Items
+                            <i class="fas fa-plus" aria-hidden="true"></i> Add Items
                         </button>
                     </a>
                 </div>

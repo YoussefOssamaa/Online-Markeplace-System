@@ -73,8 +73,13 @@ itemForm.addEventListener("submit", async function (e) {
       if (response.status === 402) {
         window.location.href = '../loginpage.html';
       }
+      if (!response.ok) {
+        return response.json().then(data => {
+          throw new Error(data.err || 'Failed to add item');
+        });
+      }
       return response.json();  
-  }) 
+    }) 
     .then(data => {
       if(data.err){
         console.log(data.err)
@@ -86,6 +91,10 @@ itemForm.addEventListener("submit", async function (e) {
       }
       console.log('Success:', data); 
     })
+    .catch(error => {
+      console.error('Error:', error);
+      alert(error.message);
+    });
  
 });
 
