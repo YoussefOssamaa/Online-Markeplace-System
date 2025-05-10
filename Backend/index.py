@@ -432,15 +432,10 @@ def handle_payment():
                 return {"err": "you are not authorized"}, 402
             else:
                 data = request.get_json()
-                # user = Customer.session.get(cust.customer_id)
                 if data['type'] == "deposit":
-                    # log_customer("deposit", user.customer_id, "deposit " + str(data['amount'])
-                    #              + "previous balance = " + str(user.balance))
                     cust.balance += float(data['amount'])
 
                 elif data['type'] == "withdraw":
-                    # log_customer("withdraw", cust.customer_id, "withdraw " + str(data['amount'])
-                    #              + "previous balance = " + str(cust.balance))
                     if cust.balance >= float(data['amount']):
                         cust.balance -= float(data['amount'])
                     else :
@@ -594,113 +589,6 @@ def purchase_item():
         return {"err": f"Internal server error: {str(e)}"}, 500
 
 
-#
-# @app.route('/user/profile', methods=['GET'])
-# def get_user_profile():
-#     try:
-#         if 'online_market_id' in session and 'online_market_email' in session:
-#             customer_id = session['online_market_id']
-#             customer = Customer.query.get(customer_id)
-#
-#             if customer is None:
-#                 session.clear()
-#                 return {"err": "User not found"}, 404
-#
-#             # Get purchased items (products in completed orders with details)
-#             purchased_items = db.session.query(
-#                 Product.product_id,
-#                 Product.description,
-#                 Product.price,
-#                 Category.name.label('category'),
-#                 Orders.order_date
-#             ).join(
-#                 OrderItem, OrderItem.product_id == Product.product_id
-#             ).join(
-#                 Orders, Orders.order_id == OrderItem.order_id
-#             ).join(
-#                 Category, Category.category_id == Product.category_id
-#             ).filter(
-#                 Orders.customer_id == customer_id
-#             ).all()
-#
-#             # Format purchased items
-#             purchased_items_list = [{
-#                 'product_id': item.product_id,
-#                 'description': item.description,
-#                 'price': float(item.price),
-#                 'category': item.category,
-#                 'purchase_date': item.order_date.strftime('%Y-%m-%d') if item.order_date else None
-#             } for item in purchased_items]
-#
-#             # Get sold items (products that were once owned by this customer but now have a different owner)
-#             sold_items = db.session.query(
-#                 Product.product_id,
-#                 Product.description,
-#                 Product.price,
-#                 Category.name.label('category'),
-#                 Payment.payment_date.label('sale_date')
-#             ).join(
-#                 OrderItem, OrderItem.product_id == Product.product_id
-#             ).join(
-#                 Orders, Orders.order_id == OrderItem.order_id
-#             ).join(
-#                 Payment, Payment.order_id == Orders.order_id
-#             ).join(
-#                 Category, Category.category_id == Product.category_id
-#             ).filter(
-#                 Payment.customer_id != customer_id,  # Payment made by someone else
-#                 Product.customer_id != customer_id  # Product now owned by someone else
-#             ).all()
-#
-#             # Format sold items
-#             sold_items_list = [{
-#                 'product_id': item.product_id,
-#                 'description': item.description,
-#                 'price': float(item.price),
-#                 'category': item.category,
-#                 'sale_date': item.sale_date.strftime('%Y-%m-%d') if item.sale_date else None
-#             } for item in sold_items]
-#
-#             # Get items yet to be sold (products currently owned by this customer with stock > 0)
-#             items_to_sell = db.session.query(
-#                 Product.product_id,
-#                 Product.description,
-#                 Product.price,
-#                 Product.stock,
-#                 Category.name.label('category')
-#             ).join(
-#                 Category, Category.category_id == Product.category_id
-#             ).filter(
-#                 Product.customer_id == customer_id,
-#                 Product.stock > 0
-#             ).all()
-#
-#             # Format items to sell
-#             items_to_sell_list = [{
-#                 'product_id': item.product_id,
-#                 'description': item.description,
-#                 'price': float(item.price),
-#                 'stock': item.stock,
-#                 'category': item.category
-#             } for item in items_to_sell]
-#
-#             # Return user profile data with all requested information
-#             return {
-#                 "success": True,
-#                 "profile": {
-#                     "name": f"{customer.first_name} {customer.last_name}",
-#                     "balance": float(customer.balance),
-#                     "purchasedItems": purchased_items_list,
-#                     "soldItems": sold_items_list,
-#                     "itemsToSell": items_to_sell_list
-#                 }
-#             }
-#         else:
-#             return {"err": "Not authorized"}, 401
-#     except Exception as e:
-#         print(f"Error fetching user profile: {str(e)}")
-#         return {"err": f"Internal server error: {str(e)}"}, 500
-
 
 @app.route('/account/update', methods=['POST'])
 def update_account():
@@ -818,10 +706,6 @@ def dashboard():
 # # Then comment it out again to avoid duplicate entries
 
 
-
-
-# #nitialize_demo_users_and_products()
-
 @app.route('/initialize_categories', methods=['POST'])
 def initialize_categories():
     from db_config import db, Category
@@ -841,68 +725,6 @@ def initialize_categories():
         db.session.commit()
         return {"message": "Categories initialized successfully"}
 
-# def initialize_demo_users_and_products():
-#     from werkzeug.security import generate_password_hash
-#     users = [
-#         {"first_name": "Bob", "last_name": "Smith", "email": "bob@example.com", "password": "bobpass", "address": "123 Main St", "phone_number": "1111111111"},
-#         {"first_name": "Alex", "last_name": "Johnson", "email": "alex@example.com", "password": "alexpass", "address": "456 Elm St", "phone_number": "2222222222"},
-#         {"first_name": "Leo", "last_name": "Williams", "email": "leo@example.com", "password": "leopass", "address": "789 Oak St", "phone_number": "3333333333"}
-#     ]
-#     products = [
-#         [
-#             {"product_name": "Bob's Book", "category_id": 1, "SKU": "BOB001", "description": "A great book by Bob", "price": 19.99, "stock": 10},
-#             {"product_name": "Bob's Pen", "category_id": 2, "SKU": "BOB002", "description": "A smooth pen", "price": 2.99, "stock": 50},
-#             {"product_name": "Bob's Bag", "category_id": 3, "SKU": "BOB003", "description": "A sturdy bag", "price": 29.99, "stock": 5}
-#         ],
-#         [
-#             {"product_name": "Alex's Laptop", "category_id": 1, "SKU": "ALEX001", "description": "A fast laptop", "price": 999.99, "stock": 3},
-#             {"product_name": "Alex's Mouse", "category_id": 2, "SKU": "ALEX002", "description": "A wireless mouse", "price": 25.99, "stock": 20},
-#             {"product_name": "Alex's Chair", "category_id": 3, "SKU": "ALEX003", "description": "A comfy chair", "price": 89.99, "stock": 7}
-#         ],
-#         [
-#             {"product_name": "Leo's Lamp", "category_id": 1, "SKU": "LEO001", "description": "A bright lamp", "price": 15.99, "stock": 12},
-#             {"product_name": "Leo's Table", "category_id": 2, "SKU": "LEO002", "description": "A wooden table", "price": 120.00, "stock": 4},
-#             {"product_name": "Leo's Mug", "category_id": 3, "SKU": "LEO003", "description": "A ceramic mug", "price": 7.99, "stock": 30}
-#         ]
-#     ]
-#     from db_config import db, Customer, Product
-#     with app.app_context():
-#         for idx, user in enumerate(users):
-#             existing = Customer.query.filter_by(email=user["email"]).first()
-#             if not existing:
-#                 new_user = Customer(
-#                     first_name=user["first_name"],
-#                     last_name=user["last_name"],
-#                     email=user["email"],
-#                     password=generate_password_hash(user["password"]),
-#                     address=user["address"],
-#                     phone_number=user["phone_number"],
-#                     balance=200.0
-#                 )
-#                 db.session.add(new_user)
-#                 db.session.commit()
-#                 for prod in products[idx]:
-#                     prod_obj = Product(
-#                         product_name=prod["product_name"],
-#                         category_id=prod["category_id"],
-#                         customer_id=new_user.customer_id,
-#                         SKU=prod["SKU"],
-#                         description=prod["description"],
-#                         price=prod["price"],
-#                         stock=prod["stock"]
-#                     )
-#                     db.session.add(prod_obj)
-#                 db.session.commit()
-#         print("Demo users and products initialized.")
-
-# # Uncomment and run once to initialize demo data
-# # initialize_demo_users_and_products()
-# # Then comment it out again to avoid duplicate entries
-
-
-
-
-# #nitialize_demo_users_and_products()
 
 app.run(debug=True)
 

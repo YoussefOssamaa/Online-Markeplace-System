@@ -40,3 +40,4 @@
 {"timestamp": "2025-05-10T08:21:04.726768", "event_type": "login", "description": "", "customer_id": 4}
 {"timestamp": "2025-05-10T11:00:45.405949", "event_type": "login", "description": "", "customer_id": 3}
 {"timestamp": "2025-05-10T11:01:55.884998", "event_type": "login", "description": "", "customer_id": 4}
+{"timestamp": "2025-05-10T11:23:37.820232", "event_type": "login", "description": "", "customer_id": 3}
