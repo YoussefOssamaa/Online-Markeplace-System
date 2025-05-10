@@ -194,15 +194,14 @@ def get_myitems():
                 
                 # Return purchased items
                 elif item_type == 'purchased':
-                    # Get products that the user has purchased with the actual purchased quantity
+                    # Get products that the user has purchased with the actual purchased quantity and price
                     purchased_items_query = db.session.query(
                         Product.product_id,
                         Product.category_id,
                         Product.product_name,
-                        Product.category_id,
                         Product.SKU,
                         Product.description,
-                        Product.price,
+                        Orders.total_price,
                         func.sum(Orders.quantity).label('total_quantity')
                     ).join(
                         Orders, Orders.product_id == Product.product_id
@@ -213,10 +212,9 @@ def get_myitems():
                         Product.product_id,
                         Product.category_id,
                         Product.product_name,
-                        Product.category_id,
                         Product.SKU,
                         Product.description,
-                        Product.price
+                        Orders.total_price
                     ).offset(offset).limit(limit).all()
                     
                     products_data = []
@@ -227,16 +225,16 @@ def get_myitems():
                             "category_id": item[1],
                             "product_name": item[2],
                             "category_name": category.name if category else "",
-                            "SKU": item[4],
-                            "description": item[5],
-                            "price": float(item[6]),
-                            "stock": int(item[7])  # This is now the sum of all purchased quantities
+                            "SKU": item[3],
+                            "description": item[4],
+                            "price": float(item[5]),  # Use the price from Orders
+                            "stock": int(item[6])  # This is the sum of all purchased quantities
                         })
                     return {"products": products_data}
                 
                 # Return sold items
                 elif item_type == 'sold':
-                    # Get products that the user has sold with the actual sold quantity
+                    # Get products that the user has sold with the actual sold quantity and price
                     sold_items = db.session.query(
                         Product,
                         db.func.sum(Orders.quantity).label('sold_quantity'),
@@ -254,7 +252,7 @@ def get_myitems():
                         prod = item[0]  # Product object
                         sold_quantity = item[1]  # Sum of quantities from Orders
                         order_date = item[2]  # Order date
-                        total_price = item[3]  # Total price of the order
+                        total_price = item[3]  # Total price from Orders
                         
                         products_data.append({
                             "product_id": prod.product_id,
@@ -263,10 +261,10 @@ def get_myitems():
                             "category_name": prod.category.name,
                             "SKU": prod.SKU,
                             "description": prod.description,
-                            "price": prod.price,
+                            "price": float(total_price) / float(sold_quantity),  # Calculate price per unit from total
                             "stock": sold_quantity,  # Use the summed sold quantity
                             "order_date": order_date.strftime('%Y-%m-%d') if order_date else None,
-                            "total_price": float(total_price) if total_price else float(prod.price) * sold_quantity
+                            "total_price": float(total_price)  # Total price of the order
                         })
                     return {"products": products_data}
                 
