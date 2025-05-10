@@ -1,0 +1,5 @@
+[]{"timestamp": "2025-05-10T06:37:39.565877", "event_type": "create", "description": "", "customer_id": 4, "target": {"product_id": 4}}
+{"timestamp": "2025-05-10T06:47:53.165172", "event_type": "update", "description": "previous values: price = 50.00, stock = 10", "customer_id": 4, "target": {"product_id": 4}}
+{"timestamp": "2025-05-10T06:48:00.100590", "event_type": "update", "description": "previous values: price = 50.00, stock = 10", "customer_id": 4, "target": {"product_id": 4}}
+{"timestamp": "2025-05-10T06:48:06.416122", "event_type": "update", "description": "previous values: price = 50.00, stock = 10", "customer_id": 4, "target": {"product_id": 4}}
+{"timestamp": "2025-05-10T06:48:25.148998", "event_type": "update", "description": "previous values: price = 60.00, stock = 10", "customer_id": 4, "target": {"product_id": 4}}

@@ -37,17 +37,36 @@ login_button.onclick = (e) => {
         })
     })
     .then(response => {
+        // First check if it's a 500 error
+        if (response.status === 500) {
+            return response.json()
+                .then(data => {
+                    // Display the actual error string from the server
+                    throw new Error(data.err || data.error || data.message || "Internal Server Error");
+                })
+                .catch(jsonError => {
+                    // If JSON parsing fails, throw a generic error
+                    console.error('JSON parsing error:', jsonError);
+                    throw new Error("Internal Server Error: Server response could not be processed");
+                });
+        }
+        // Then handle other non-ok responses
         if (!response.ok) {
-            return response.json().then(data => {
-                throw new Error(data.err || "Login failed");
-            });
+            return response.json()
+                .then(data => {
+                    throw new Error(data.err || "Login failed");
+                })
+                .catch(jsonError => {
+                    // If JSON parsing fails, throw a generic error with status
+                    console.error('JSON parsing error:', jsonError);
+                    throw new Error(`Login failed: Server returned ${response.status}`);
+                });
         }
         return response.json();
     })
     .then(data => {
         console.log(data);
         if (data.success) {
-
             window.location.href = 'DashBoard/dashboard.html';
         }
     })

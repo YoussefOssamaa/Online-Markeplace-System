@@ -44,8 +44,10 @@ itemForm.addEventListener("submit", async function (e) {
   const Stock = document.getElementById("Stock").value.trim();
   const SKW = document.getElementById("SKW").value.trim();
   const price = parseFloat(priceInput).toFixed(2);
-  const selectedValue = category_Select.value
-  if (!name || !desc || isNaN(price ||Stock || SKW || selectedValue )) {
+  const selectedValue = category_Select.value;
+  
+  // Fixed validation logic - checking each field properly
+  if (!name || !desc || isNaN(parseFloat(priceInput)) || isNaN(parseFloat(Stock)) || !SKW || !selectedValue) {
     alert("Please fill all fields correctly.");
     return;
   }
@@ -76,11 +78,12 @@ itemForm.addEventListener("submit", async function (e) {
     .then(data => {
       if(data.err){
         console.log(data.err)
+      } else {
+        alert("Your product was added successfully")
+        setTimeout(()=>{
+          window.location.href = '../DashBoard/myProducts.html'; // Redirect to products page instead
+        },2000)
       }
-      setTimeout(()=>{
-        window.location.href = '../DashBoard/dashboard.html';
-      },2000)
-      alert("your product was added successfully")
       console.log('Success:', data); 
     })
  

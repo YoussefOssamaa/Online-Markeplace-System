@@ -5,7 +5,11 @@ from datetime import date
 app = Flask(__name__)
 
 # Update connection string to connect to Citus Docker container
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5433/online_market'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5433/online_market'
+#app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://market_user:1234QWERa@localhost:5432/online_market"
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5432/online_market'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:%20@localhost:5432/online_market'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)

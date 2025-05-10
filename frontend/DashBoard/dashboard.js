@@ -8,19 +8,37 @@ document.addEventListener("DOMContentLoaded", () => {
         card.style.cursor = "pointer";
 
         card.addEventListener('click', (event) => {
-            event.preventDefault(); // Prevent default link behavior
+            event.preventDefault();
 
             const linkElement = card.querySelector('a.setting-box');
             if (linkElement && linkElement.href) {
-                window.open(linkElement.href, '_blank'); // Open in new tab
+                window.location.href = linkElement.href;  // Changed from window.open to window.location.href
             }
         });
     });
+    // Logout integration
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            fetch('http://127.0.0.1:5000/logout', {
+                method: 'POST',
+                credentials: "include"
+            })
+            .then(() => {
+                sessionStorage.clear();
+                localStorage.clear();
+                window.location.href = '../loginpage.html';
+            })
+            .catch(() => {
+                window.location.href = '../loginpage.html';
+            });
+        });
+    }
 });
 
 // // Function to fetch user data from the backend
 function fetchUserData() {
-    fetch('http://127.0.0.1:5000//dashboard', {
+    fetch('http://127.0.0.1:5000/dashboard', {
         method: 'GET',
         credentials: "include", 
         headers: {
@@ -33,8 +51,9 @@ function fetchUserData() {
             if(data.err == "unauthorized"){
                 window.location.href = '../loginpage.html';
             }else{
-                window.location.href = '../html/err_page.html';
-
+                // Display error instead of redirecting
+                alert("Error: " + data.err);
+                // window.location.href = '../html/err_page.html';
             }      
         } else {
             console.log(data)
@@ -43,7 +62,16 @@ function fetchUserData() {
     })
     .catch(error => {
         console.error('Error fetching user data:', error);
-        window.location.href = '../html/err_page.html';
+        // Display error instead of redirecting
+        
+        // Check if it's a network-related error
+        if (error.message === 'Failed to fetch') {
+            alert("Network error: Unable to connect to the server. Please check your internet connection and verify the server is running.");
+        } else {
+            // Display the original error message
+            alert("Error: " + error.message);
+        }
+        // window.location.href = '../html/err_page.html';
     });
 }
 

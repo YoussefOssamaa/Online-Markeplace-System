@@ -42,6 +42,9 @@ async function fetch_products(search_text , catID) {
                 <div class="product-name limit-text-to-2-lines">
                     ${product.product_name}
                 </div>
+                <div class="seller-name">
+                    Seller: ${product.seller_name}
+                </div>
                 <div class="product-price">
                   price $${product.price}
                 </div>
@@ -74,7 +77,7 @@ async function fetch_products(search_text , catID) {
     })
     }).catch(error => console.error('Error loading JSON:', error));
 }
-async function purchase(product_id , quantity){
+async function purchase(product_id, quantity){
   fetch('http://127.0.0.1:5000/purchase', {
     method: 'POST',
     credentials: "include", 
@@ -85,9 +88,8 @@ async function purchase(product_id , quantity){
         "product_id" : product_id,
         "stock" : quantity
     }) 
-})
+  })
   .then(response => response.json()) 
-  // In the login button onclick handler:
   .then(data => {
       console.log(data);
       if(data.success) {
@@ -98,10 +100,12 @@ async function purchase(product_id , quantity){
           alert(data.success)
           // Redirect to dashboard on successful login
       } else if(data.err) {  
-        alert( data.err);
+        alert(data.err);
       }
   })
   .catch(error => {
+    alert('An error occurred during purchase. Please try again.');
+    console.error('Purchase error:', error);
   });
 }
 fetch('http://127.0.0.1:5000/dashboard', {

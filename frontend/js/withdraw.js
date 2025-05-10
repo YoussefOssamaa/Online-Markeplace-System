@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   const withdrawButton = document.querySelector('.withdraw-container button');
   
-  fetch('http://127.0.0.1:5000//dashboard', {
+  fetch('http://127.0.0.1:5000/dashboard', { // Fixed double slash
     method: 'GET',
     credentials: "include", 
     headers: {
@@ -14,12 +14,24 @@ document.addEventListener('DOMContentLoaded', function() {
         if(data.err == "unauthorized"){
             window.location.href = '../loginpage.html';
         }else{
-          window.location.href = '../html/err_page.html';
+          // Display error instead of redirecting
+          alert("Error: " + data.err);
+          // window.location.href = '../html/err_page.html';
         }      
     }
   })
   .catch(error => {
-      window.location.href = '../html/err_page.html';
+      // Display error instead of redirecting
+      console.error('Error:', error);
+      
+      // Check if it's a network-related error
+      if (error.message === 'Failed to fetch') {
+          alert("Network error: Unable to connect to the server. Please check your internet connection and verify the server is running.");
+      } else {
+          // Display the original error message
+          alert("Error: " + error.message);
+      }
+      // window.location.href = '../html/err_page.html';
   });
   if (withdrawButton) {
     withdrawButton.addEventListener('click', function() {
@@ -47,17 +59,27 @@ document.addEventListener('DOMContentLoaded', function() {
           }) 
             .then(data => {
               if(data.err){
-                alert(data.err)
+                alert(data.err);
+              } else if(data.success) {
+                alert("Your balance was updated successfully");
+                setTimeout(()=>{
+                  window.location.href = '../DashBoard/dashboard.html';
+                }, 2000); // Reduced timeout for better UX
               }
-              setTimeout(()=>{
-                window.location.href = '../DashBoard/dashboard.html';
-              },3000)
-              alert("your balance was updated successfully")
               console.log('Success:', data); 
             })
             .catch(error => {
-              window.location.href = '../html/err_page.html';
+              // Display error instead of redirecting
+              console.error('Error:', error);
+              
+              // Check if it's a network-related error
+              if (error.message === 'Failed to fetch') {
+                  alert("Network error: Unable to connect to the server. Please check your internet connection and verify the server is running.");
+              } else {
+                  // Display the original error message
+                  alert("Error: " + error.message);
+              }
             });
-      });
+    });
   }
 });

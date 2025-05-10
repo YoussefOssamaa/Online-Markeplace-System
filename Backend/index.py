@@ -9,6 +9,9 @@ from log import *
 from flask_cors import CORS, cross_origin
 from flask import send_from_directory
 import os
+from datetime import date
+from sqlalchemy.sql import func
+from sqlalchemy.exc import IntegrityError, DataError
 
 app.secret_key = 'b9c0e27183b3460490a4f817c8436a98bccf3f4c8d6c4fa39456aa48263100cf'
 
@@ -107,7 +110,7 @@ def login():
         return {"err": "Invalid data format"}, 400
     except Exception as e:
         print(f"Unexpected error: {str(e)}")
-        return {"err": "Internal server error"}, 500
+        return {"err": f"Internal server error: {str(e)}"}, 500
 
 @app.route('/logout', methods=['POST'])
 def logout():
@@ -151,7 +154,7 @@ def add_item():
     except (IntegrityError, DataError) as e:
         return {"err": "the data you entered is wrong format"}, 400
     except Exception as e:
-        return {"err": "internal server error"}, 500
+        return {"err": f"Internal server error: {str(e)}"}, 500
 
 
 @app.route('/item', methods=['GET'])
@@ -168,21 +171,105 @@ def get_myitems():
             else:
                 offset = request.args.get('offset', default=0, type=int)
                 limit = request.args.get('limit', default=10, type=int)
-                products = Product.query.filter_by(customer_id=cust.customer_id).offset(offset).limit(limit).all()
-                products_data = []
-                for prod in products:
-                    products_data.append({
-                        "product_id": prod.product_id,
-                        "category_id": prod.category_id,
-                        "product_name" : prod.product_name,
-                        "category_name": prod.category.name,
-                        "SKU": prod.SKU,
-                        "description": prod.description,
-                        "price": prod.price,
-                        "stock": prod.stock
-                    })
-
-                return {"products": products_data}
+                item_type = request.args.get('type', default=None)
+                
+                # Default behavior - return items for sale by the current user
+                if item_type is None:
+                    products = Product.query.filter_by(customer_id=cust.customer_id).offset(offset).limit(limit).all()
+                    products_data = []
+                    for prod in products:
+                        products_data.append({
+                            "product_id": prod.product_id,
+                            "category_id": prod.category_id,
+                            "product_name": prod.product_name,
+                            "category_name": prod.category.name,
+                            "SKU": prod.SKU,
+                            "description": prod.description,
+                            "price": prod.price,
+                            "stock": prod.stock
+                        })
+                    return {"products": products_data}
+                
+                # Return purchased items
+                elif item_type == 'purchased':
+                    # Get products that the user has purchased with the actual purchased quantity
+                    purchased_items_query = db.session.query(
+                        Product.product_id,
+                        Product.category_id,
+                        Product.product_name,
+                        Product.category_id,
+                        Product.SKU,
+                        Product.description,
+                        Product.price,
+                        func.sum(Orders.quantity).label('total_quantity')
+                    ).join(
+                        Orders, Orders.product_id == Product.product_id
+                    ).filter(
+                        Orders.customer_id == cust.customer_id,
+                        Orders.seller_id != cust.customer_id
+                    ).group_by(
+                        Product.product_id,
+                        Product.category_id,
+                        Product.product_name,
+                        Product.category_id,
+                        Product.SKU,
+                        Product.description,
+                        Product.price
+                    ).offset(offset).limit(limit).all()
+                    
+                    products_data = []
+                    for item in purchased_items_query:
+                        category = Category.query.get(item[1])
+                        products_data.append({
+                            "product_id": item[0],
+                            "category_id": item[1],
+                            "product_name": item[2],
+                            "category_name": category.name if category else "",
+                            "SKU": item[4],
+                            "description": item[5],
+                            "price": float(item[6]),
+                            "stock": int(item[7])  # This is now the sum of all purchased quantities
+                        })
+                    return {"products": products_data}
+                
+                # Return sold items
+                elif item_type == 'sold':
+                    # Get products that the user has sold with the actual sold quantity
+                    sold_items = db.session.query(
+                        Product,
+                        Orders.quantity,
+                        Orders.order_date,
+                        Orders.total_price
+                    ).join(
+                        Orders, Orders.product_id == Product.product_id
+                    ).filter(
+                        Orders.seller_id == cust.customer_id,
+                        Orders.customer_id != cust.customer_id
+                    ).offset(offset).limit(limit).all()
+                    
+                    products_data = []
+                    for item in sold_items:
+                        prod = item[0]  # Product object
+                        sold_quantity = item[1]  # Quantity from Orders
+                        order_date = item[2]  # Order date
+                        total_price = item[3]  # Total price of the order
+                        
+                        products_data.append({
+                            "product_id": prod.product_id,
+                            "category_id": prod.category_id,
+                            "product_name": prod.product_name,
+                            "category_name": prod.category.name,
+                            "SKU": prod.SKU,
+                            "description": prod.description,
+                            "price": prod.price,
+                            "stock": sold_quantity,  # Use the sold quantity instead of current stock
+                            "order_date": order_date.strftime('%Y-%m-%d') if order_date else None,
+                            "total_price": float(total_price) if total_price else float(prod.price) * sold_quantity
+                        })
+                    return {"products": products_data}
+                
+                else:
+                    return {"err": "Invalid item type"}, 400
 
         else:
             return {"err": "you are not authorized"}, 402
@@ -192,7 +279,7 @@ def get_myitems():
     except (IntegrityError, DataError) as e:
         return {"err": "the data you entered is wrong format"}, 400
     except Exception as e:
-        return {"err": "internal server error"}, 500
+        return {"err": f"Internal server error: {str(e)}"}, 500
 
 
 @app.route('/item/edit', methods=['POST'])
@@ -216,13 +303,24 @@ def edit_item():
                 return {"err": "product not found"}, 404
 
             if new_product.customer_id == cust.customer_id:
-                    log_product("update", cust.customer_id, new_product.product_id,
-                                f"previous price = {new_product.price}, new price = {product_data.get('price')}")
-                    new_product.price = product_data.get("price", new_product.price)
-                    new_product.description = product_data.get("description", new_product.description)
-                    # new_product.stock = product["stock"]
-                    # new_product.SKU = product["SKU"]
-                    # new_product.category_id = product["category_id"]
+                    log_message = f"previous values: price = {new_product.price}"
+                    
+                    # Update product fields if provided
+                    if 'price' in product_data:
+                        new_product.price = product_data["price"]
+                    if 'description' in product_data:
+                        new_product.description = product_data["description"]
+                    if 'stock' in product_data:
+                        log_message += f", stock = {new_product.stock}"
+                        new_product.stock = product_data["stock"]
+                    if 'product_name' in product_data:
+                        new_product.product_name = product_data["product_name"]
+                    if 'SKU' in product_data:
+                        new_product.SKU = product_data["SKU"]
+                    if 'category_id' in product_data:
+                        new_product.category_id = product_data["category_id"]
+                    
+                    log_product("update", cust.customer_id, new_product.product_id, log_message)
                     db.session.commit()
 
                     return {"success": "the product is edited successfully"}
@@ -254,42 +352,34 @@ def search_item():
                 limit = request.args.get('limit', default=10, type=int)
                 search = request.args.get('search_text', default="")
                 category_id = request.args.get('category_id', type=int ,default = -1)
-                query = Product.query.join(Category, Product.category_id == Category.category_id)
-                if category_id != -1 :
-                    query = query.filter(Product.category_id == category_id )
-                elif search:
-                    search_filter = f"%{search}%"
-                    query = query.filter(
-                        or_(
-                            Product.description.ilike(search_filter),
-                            Product.SKU.ilike(search_filter),
-                            Category.name.ilike(search_filter)
-                        )
-                    )
-
+                query = Product.query.join(Category, Product.category_id == Category.category_id)\
+                    .join(Customer, Product.customer_id == Customer.customer_id)
+                
+                if search:
+                    query = query.filter(Product.product_name.ilike(f'%{search}%'))
+                if category_id != -1:
+                    query = query.filter(Product.category_id == category_id)
+                
                 products = query.offset(offset).limit(limit).all()
-                # products = Product.query.filter_by().offset(offset).limit(limit).all()
                 products_data = []
                 for prod in products:
+                    seller = Customer.query.get(prod.customer_id)
+                    seller_name = f"{seller.first_name} {seller.last_name}" if seller else "Unknown"
                     products_data.append({
-                        "product_name": prod.product_name,
                         "product_id": prod.product_id,
                         "category_id": prod.category_id,
+                        "product_name": prod.product_name,
                         "category_name": prod.category.name,
-                        "SKU": prod.SKU,
                         "description": prod.description,
                         "price": prod.price,
-                        "stock": prod.stock
+                        "stock": prod.stock,
+                        "seller_name": seller_name
                     })
-
                 return {"products": products_data}
-
         else:
-            return {"err": "you are not authorized"}
-    except (IntegrityError, DataError) as e:
-        return {"err": "the data you entered is wrong format"}, 400
+            return {"err": "you are not authorized"}, 402
     except Exception as e:
-        return {"err": "internal server error"}, 500
+        return {"err": f"Internal server error: {str(e)}"}, 500
 
 
 @app.route('/item/<int:product_id>', methods=['GET'])
@@ -309,7 +399,7 @@ def get_item(product_id):
 
             }}
     except Exception as e:
-        return {"err": "internal server error"}, 500
+        return {"err": f"Internal server error: {str(e)}"}, 500
 
 @app.route('/category', methods=['GET'])
 def get_categories():
@@ -326,7 +416,7 @@ def get_categories():
         return {"categories" : categories_data}
 
     except Exception as e:
-        return {"err": "internal server error"}, 500
+        return {"err": f"Internal server error: {str(e)}"}, 500
 
 
 @app.route('/payment', methods=['POST'])
@@ -373,7 +463,7 @@ def handle_payment():
     except (IntegrityError, DataError) as e:
         return {"err": "the data you entered is wrong format"}, 400
     except Exception as e:
-        return {"err": "internal server error"}, 500
+        return {"err": f"Internal server error: {str(e)}"}, 500
 
 
 @app.route('/report/customer', methods=['GET'])
@@ -390,7 +480,7 @@ def get_customer_report():
         else:
             return {"err": "you are not authorized"}, 402
     except Exception as e:
-        return {"err": "internal server error"}, 500
+        return {"err": f"Internal server error: {str(e)}"}, 500
 
 
 @app.route('/report/order', methods=['GET'])
@@ -407,99 +497,102 @@ def get_order_report():
         else:
             return {"err": "you are not authorized"}, 402
     except Exception as e:
-        return {"err": "internal server error"}, 500
-#
-# @app.route('/purchase/<int:product_id>', methods=['POST'])
-# def purchase_item(product_id):
-#     try:
-#         if 'online_market_id' in session and 'online_market_email' in session:
-#             buyer = Customer.query.filter(
-#                 Customer.email == session['online_market_email'],
-#             ).first()
-#
-#             if buyer is None:
-#                 session.clear()
-#                 return {"err": "you are not authorized"}, 402
-#
-#             # Get the product
-#             product = Product.query.get(product_id)
-#             if product is None:
-#                 return {"err": "Product not found"}, 404
-#
-#             # Check if user is trying to buy their own product
-#             if product.customer_id == buyer.customer_id:
-#                 return {"err": "You cannot purchase your own product"}, 400
-#
-#             # Get the seller
-#             seller = Customer.query.get(product.customer_id)
-#             if seller is None:
-#                 return {"err": "Seller not found"}, 404
-#
-#             # Check if product is in stock
-#             if product.stock <= 0:
-#                 return {"err": "Product is out of stock"}, 400
-#
-#             # Check if buyer has enough balance
-#             price = float(product.price)
-#             if buyer.balance < price:
-#                 return {"err": "Insufficient balance"}, 400
-#
-#             # Create a new order
-#             from datetime import date
-#             new_order = Orders(
-#                 customer_id=buyer.customer_id,
-#                 order_date=date.today(),
-#                 total_price=price
-#             )
-#             db.session.add(new_order)
-#             db.session.flush()  # Get the order ID without committing
-#
-#             # Create order item
-#             order_item = OrderItem(
-#                 order_id=new_order.order_id,
-#                 product_id=product.product_id,
-#                 quantity=1,
-#                 price=price
-#             )
-#             db.session.add(order_item)
-#
-#             # Create payment record
-#             payment = Payment(
-#                 customer_id=buyer.customer_id,
-#                 order_id=new_order.order_id,
-#                 payment_date=date.today(),
-#                 payment_method="Account Balance",
-#                 amount=price
-#             )
-#             db.session.add(payment)
-#
-#             # Transfer money from buyer to seller
-#             buyer.balance -= price
-#             seller.balance += price
-#
-#             # Transfer ownership of the product
-#             product.customer_id = buyer.customer_id
-#
-#             # Decrement stock
-#             product.stock -= 1
-#
-#             # Log the transaction
-#             log_customer("purchase", buyer.customer_id, f"Purchased product {product_id} for {price}")
-#             log_customer("sale", seller.customer_id, f"Sold product {product_id} for {price}")
-#
-#             # Commit all changes
-#             db.session.commit()
-#
-#             return {"success": "Purchase completed successfully"}
-#         else:
-#             return {"err": "you are not authorized"}, 402
-#
-#     except (IntegrityError, DataError) as e:
-#         db.session.rollback()
-#         return {"err": "Data error occurred"}, 400
-#     except Exception as e:
-#         db.session.rollback()
-#         return {"err": f"Internal server error: {str(e)}"}, 500
+        return {"err": f"Internal server error: {str(e)}"}, 500
+
+
+@app.route('/purchase', methods=['POST'])
+def purchase_item():
+    try:
+        if 'online_market_id' in session and 'online_market_email' in session:
+            buyer = Customer.query.filter(
+                Customer.email == session['online_market_email'],
+            ).first()
+
+            if buyer is None:
+                session.clear()
+                return {"err": "you are not authorized"}, 402
+
+            data = request.get_json()
+            product_id = data.get('product_id')
+            quantity = int(data.get('stock', 1))
+
+            # Get the product
+            product = Product.query.get(product_id)
+            if product is None:
+                return {"err": "Product not found"}, 404
+
+            # Check if user is trying to buy their own product
+            if product.customer_id == buyer.customer_id:
+                return {"err": "You cannot purchase your own product"}, 400
+
+            # Get the seller
+            seller = Customer.query.get(product.customer_id)
+            if seller is None:
+                return {"err": "Seller not found"}, 404
+
+            # Check if product has enough stock
+            if product.stock < quantity:
+                return {"err": "Not enough stock available"}, 400
+
+            # Calculate total price
+            total_price = float(product.price) * quantity
+            
+            # Check if buyer has enough balance
+            if buyer.balance < total_price:
+                return {"err": "Insufficient balance"}, 400
+
+            # Create a new order
+            new_order = Orders(
+                customer_id=buyer.customer_id,
+                seller_id=seller.customer_id,
+                product_id=product.product_id,
+                quantity=quantity,
+                order_date=date.today(),
+                total_price=total_price
+            )
+            db.session.add(new_order)
+            db.session.flush()  # Get the order ID without committing
+
+            # Create order item
+            order_item = OrderItem(
+                order_id=new_order.order_id,
+                product_id=product.product_id,
+                quantity=quantity,
+                price=total_price
+            )
+            db.session.add(order_item)
+
+            # Create payment record
+            payment = Payment(
+                customer_id=buyer.customer_id,
+                payment_date=date.today(),
+                card_number="Account Balance",
+                type="purchase",
+                amount=total_price
+            )
+            db.session.add(payment)
+
+            # Transfer money from buyer to seller
+            buyer.balance -= total_price
+            seller.balance += total_price
+
+            # Update product stock (don't transfer ownership, just reduce stock)
+            product.stock -= quantity
+
+            # Commit all changes
+            db.session.commit()
+
+            return {"success": "Purchase completed successfully"}
+        else:
+            return {"err": "you are not authorized"}, 402
+
+    except (IntegrityError, DataError) as e:
+        db.session.rollback()
+        return {"err": f"Data error occurred: {str(e)}"}, 400  # Added error details for debugging
+    except Exception as e:
+        db.session.rollback()
+        return {"err": f"Internal server error: {str(e)}"}, 500
+
 
 #
 # @app.route('/user/profile', methods=['GET'])
@@ -606,7 +699,7 @@ def get_order_report():
 #             return {"err": "Not authorized"}, 401
 #     except Exception as e:
 #         print(f"Error fetching user profile: {str(e)}")
-#         return {"err": "Internal server error"}, 500
+#         return {"err": f"Internal server error: {str(e)}"}, 500
 
 
 @app.route('/account/update', methods=['POST'])
@@ -646,11 +739,11 @@ def update_account():
         return {"success": "Account updated successfully"}
 
     except Exception as e:
-        return {"err": "internal server error"}, 500
+        return {"err": f"Internal server error: {str(e)}"}, 500
 
 
 @app.route('/dashboard')
-@cross_origin(supports_credentials=True, origins=["http://127.0.0.1:5500"])
+@cross_origin(supports_credentials=True, origins=["http://127.0.0.1:5500", "http://127.0.0.1:5501"])
 def dashboard():
     if 'online_market_id' not in session:
         return {"err": "unauthorized"}, 401
@@ -666,7 +759,151 @@ def dashboard():
     except Exception as e :
         return  {"err" : "interval server error"} , 500
 
-app.run(debug=True)
+# def initialize_demo_users_and_products():
+#     from werkzeug.security import generate_password_hash
+#     users = [
+#         {"first_name": "Bob", "last_name": "Smith", "email": "bob@example.com", "password": "bobpass", "address": "123 Main St", "phone_number": "1111111111"},
+#         {"first_name": "Alex", "last_name": "Johnson", "email": "alex@example.com", "password": "alexpass", "address": "456 Elm St", "phone_number": "2222222222"},
+#         {"first_name": "Leo", "last_name": "Williams", "email": "leo@example.com", "password": "leopass", "address": "789 Oak St", "phone_number": "3333333333"}
+#     ]
+#     products = [
+#         [
+#             {"product_name": "Bob's Book", "category_id": 1, "SKU": "BOB001", "description": "A great book by Bob", "price": 19.99, "stock": 10},
+#             {"product_name": "Bob's Pen", "category_id": 2, "SKU": "BOB002", "description": "A smooth pen", "price": 2.99, "stock": 50},
+#             {"product_name": "Bob's Bag", "category_id": 3, "SKU": "BOB003", "description": "A sturdy bag", "price": 29.99, "stock": 5}
+#         ],
+#         [
+#             {"product_name": "Alex's Laptop", "category_id": 1, "SKU": "ALEX001", "description": "A fast laptop", "price": 999.99, "stock": 3},
+#             {"product_name": "Alex's Mouse", "category_id": 2, "SKU": "ALEX002", "description": "A wireless mouse", "price": 25.99, "stock": 20},
+#             {"product_name": "Alex's Chair", "category_id": 3, "SKU": "ALEX003", "description": "A comfy chair", "price": 89.99, "stock": 7}
+#         ],
+#         [
+#             {"product_name": "Leo's Lamp", "category_id": 1, "SKU": "LEO001", "description": "A bright lamp", "price": 15.99, "stock": 12},
+#             {"product_name": "Leo's Table", "category_id": 2, "SKU": "LEO002", "description": "A wooden table", "price": 120.00, "stock": 4},
+#             {"product_name": "Leo's Mug", "category_id": 3, "SKU": "LEO003", "description": "A ceramic mug", "price": 7.99, "stock": 30}
+#         ]
+#     ]
+#     from db_config import db, Customer, Product
+#     with app.app_context():
+#         for idx, user in enumerate(users):
+#             existing = Customer.query.filter_by(email=user["email"]).first()
+#             if not existing:
+#                 new_user = Customer(
+#                     first_name=user["first_name"],
+#                     last_name=user["last_name"],
+#                     email=user["email"],
+#                     password=generate_password_hash(user["password"]),
+#                     address=user["address"],
+#                     phone_number=user["phone_number"],
+#                     balance=200.0
+#                 )
+#                 db.session.add(new_user)
+#                 db.session.commit()
+#                 for prod in products[idx]:
+#                     prod_obj = Product(
+#                         product_name=prod["product_name"],
+#                         category_id=prod["category_id"],
+#                         customer_id=new_user.customer_id,
+#                         SKU=prod["SKU"],
+#                         description=prod["description"],
+#                         price=prod["price"],
+#                         stock=prod["stock"]
+#                     )
+#                     db.session.add(prod_obj)
+#                 db.session.commit()
+#         print("Demo users and products initialized.")
 
+# # Uncomment and run once to initialize demo data
+# # initialize_demo_users_and_products()
+# # Then comment it out again to avoid duplicate entries
+
+
+
+
+# #nitialize_demo_users_and_products()
+
+@app.route('/initialize_categories', methods=['POST'])
+def initialize_categories():
+    from db_config import db, Category
+    
+    categories = [
+        {"name": "Electronics"},
+        {"name": "Clothes"}
+    ]
+    
+    with app.app_context():
+        for category_data in categories:
+            existing = Category.query.filter_by(name=category_data["name"]).first()
+            if not existing:
+                new_category = Category(name=category_data["name"])
+                db.session.add(new_category)
+        
+        db.session.commit()
+        return {"message": "Categories initialized successfully"}
+
+# def initialize_demo_users_and_products():
+#     from werkzeug.security import generate_password_hash
+#     users = [
+#         {"first_name": "Bob", "last_name": "Smith", "email": "bob@example.com", "password": "bobpass", "address": "123 Main St", "phone_number": "1111111111"},
+#         {"first_name": "Alex", "last_name": "Johnson", "email": "alex@example.com", "password": "alexpass", "address": "456 Elm St", "phone_number": "2222222222"},
+#         {"first_name": "Leo", "last_name": "Williams", "email": "leo@example.com", "password": "leopass", "address": "789 Oak St", "phone_number": "3333333333"}
+#     ]
+#     products = [
+#         [
+#             {"product_name": "Bob's Book", "category_id": 1, "SKU": "BOB001", "description": "A great book by Bob", "price": 19.99, "stock": 10},
+#             {"product_name": "Bob's Pen", "category_id": 2, "SKU": "BOB002", "description": "A smooth pen", "price": 2.99, "stock": 50},
+#             {"product_name": "Bob's Bag", "category_id": 3, "SKU": "BOB003", "description": "A sturdy bag", "price": 29.99, "stock": 5}
+#         ],
+#         [
+#             {"product_name": "Alex's Laptop", "category_id": 1, "SKU": "ALEX001", "description": "A fast laptop", "price": 999.99, "stock": 3},
+#             {"product_name": "Alex's Mouse", "category_id": 2, "SKU": "ALEX002", "description": "A wireless mouse", "price": 25.99, "stock": 20},
+#             {"product_name": "Alex's Chair", "category_id": 3, "SKU": "ALEX003", "description": "A comfy chair", "price": 89.99, "stock": 7}
+#         ],
+#         [
+#             {"product_name": "Leo's Lamp", "category_id": 1, "SKU": "LEO001", "description": "A bright lamp", "price": 15.99, "stock": 12},
+#             {"product_name": "Leo's Table", "category_id": 2, "SKU": "LEO002", "description": "A wooden table", "price": 120.00, "stock": 4},
+#             {"product_name": "Leo's Mug", "category_id": 3, "SKU": "LEO003", "description": "A ceramic mug", "price": 7.99, "stock": 30}
+#         ]
+#     ]
+#     from db_config import db, Customer, Product
+#     with app.app_context():
+#         for idx, user in enumerate(users):
+#             existing = Customer.query.filter_by(email=user["email"]).first()
+#             if not existing:
+#                 new_user = Customer(
+#                     first_name=user["first_name"],
+#                     last_name=user["last_name"],
+#                     email=user["email"],
+#                     password=generate_password_hash(user["password"]),
+#                     address=user["address"],
+#                     phone_number=user["phone_number"],
+#                     balance=200.0
+#                 )
+#                 db.session.add(new_user)
+#                 db.session.commit()
+#                 for prod in products[idx]:
+#                     prod_obj = Product(
+#                         product_name=prod["product_name"],
+#                         category_id=prod["category_id"],
+#                         customer_id=new_user.customer_id,
+#                         SKU=prod["SKU"],
+#                         description=prod["description"],
+#                         price=prod["price"],
+#                         stock=prod["stock"]
+#                     )
+#                     db.session.add(prod_obj)
+#                 db.session.commit()
+#         print("Demo users and products initialized.")
+
+# # Uncomment and run once to initialize demo data
+# # initialize_demo_users_and_products()
+# # Then comment it out again to avoid duplicate entries
+
+
+
+
+# #nitialize_demo_users_and_products()
+
+app.run(debug=True)
 
 
