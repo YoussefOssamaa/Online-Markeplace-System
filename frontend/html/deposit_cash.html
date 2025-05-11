@@ -66,6 +66,11 @@
     <script src="../js/deposit.js" defer></script>
 </head>
 <body>
+    <div style="text-align:center; margin: 20px;">
+        <button onclick="window.location.href='../DashBoard/dashboard.html'" style="padding:10px 20px; border-radius:6px; background:#3498db; color:white; border:none; font-weight:bold; cursor:pointer;">
+          Back to Dashboard
+        </button>
+      </div>
     <div class="deposit-container">
         <h2>Deposit Cash</h2>
         <div class="form-group">
@@ -76,16 +81,6 @@
             <label for="cardNumber">Card Number</label>
             <input type="text" id="cardNumber" placeholder="XXXX-XXXX-XXXX-XXXX">
         </div>
-        <!-- <div class="inline-inputs">
-            <div class="form-group">
-                <label for="expiryDate">Expiry Date</label>
-                <input type="text" id="expiryDate" placeholder="MM/YY">
-            </div>
-            <div class="form-group">
-                <label for="cvv">CW</label>
-                <input type="text" id="cvv" placeholder="CVV">
-            </div>
-        </div> -->
         <button>Deposit</button>
     </div>
 </body>

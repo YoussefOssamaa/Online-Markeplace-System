@@ -12,29 +12,18 @@
       <h1>Products Report</h1>
     </header>
 
-    <div class="report-summary">
-      <h2 class="summary-item">Total Sold Items: <span id="totalSold"></span></h2>
-      <h2 class="summary-item">Top Category: <span id="topCategory">N/A</span></h2>
+    <div class="report-tabs" style="text-align:center; margin-bottom:20px;">
+      <button onclick="showReport('deposit')" class="tab-btn" id="tab-deposit">Deposit Reports</button>
+      <button onclick="showReport('withdraw')" class="tab-btn" id="tab-withdraw">Withdraw Reports</button>
+      <button onclick="showReport('purchase')" class="tab-btn" id="tab-purchase">Purchase Reports</button>
+      <button onclick="showReport('sales')" class="tab-btn" id="tab-sales">Sales Reports</button>
     </div>
+    <div id="report-content"></div>
 
-    <div class="table-container">
-      <table class="report-table">
-        <thead>
-          <tr>
-            <th>User ID</th>
-            <th>Product ID</th>
-            <th>Product Category</th>
-            <th>Purchase Date</th>
-          </tr>
-        </thead>
-        <tbody>
 
-        </tbody>
-      </table>
-    </div>
-    <div class="chart-container">
-        <canvas id="salesChart" width="600" height="300"></canvas>
-      </div>
+
+
+
       
   </div>
   <script src="productsReport.js"></script>

@@ -202,7 +202,8 @@ def get_myitems():
                         Product.SKU,
                         Product.description,
                         Orders.total_price,
-                        func.sum(Orders.quantity).label('total_quantity')
+                        func.sum(Orders.quantity).label('total_quantity'),
+                        Orders.seller_id
                     ).join(
                         Orders, Orders.product_id == Product.product_id
                     ).filter(
@@ -214,12 +215,15 @@ def get_myitems():
                         Product.product_name,
                         Product.SKU,
                         Product.description,
-                        Orders.total_price
+                        Orders.total_price,
+                        Orders.seller_id
                     ).offset(offset).limit(limit).all()
                     
                     products_data = []
                     for item in purchased_items_query:
                         category = Category.query.get(item[1])
+                        seller = Customer.query.get(item[7])
+                        seller_name = f"{seller.first_name} {seller.last_name}" if seller else "Unknown"
                         products_data.append({
                             "product_id": item[0],
                             "category_id": item[1],
@@ -228,7 +232,8 @@ def get_myitems():
                             "SKU": item[3],
                             "description": item[4],
                             "price": float(item[5]),  # Use the price from Orders
-                            "stock": int(item[6])  # This is the sum of all purchased quantities
+                            "stock": int(item[6]),  # This is the sum of all purchased quantities
+                            "seller_name": seller_name
                         })
                     return {"products": products_data}
                 
@@ -239,13 +244,14 @@ def get_myitems():
                         Product,
                         db.func.sum(Orders.quantity).label('sold_quantity'),
                         Orders.order_date,
-                        Orders.total_price
+                        Orders.total_price,
+                        Orders.customer_id
                     ).join(
                         Orders, Orders.product_id == Product.product_id
                     ).filter(
                         Orders.seller_id == cust.customer_id,
                         Orders.customer_id != cust.customer_id
-                    ).group_by(Product.product_id, Orders.order_date, Orders.total_price).offset(offset).limit(limit).all()
+                    ).group_by(Product.product_id, Orders.order_date, Orders.total_price, Orders.customer_id).offset(offset).limit(limit).all()
                     
                     products_data = []
                     for item in sold_items:
@@ -253,7 +259,8 @@ def get_myitems():
                         sold_quantity = item[1]  # Sum of quantities from Orders
                         order_date = item[2]  # Order date
                         total_price = item[3]  # Total price from Orders
-                        
+                        buyer = Customer.query.get(item[4])
+                        buyer_name = f"{buyer.first_name} {buyer.last_name}" if buyer else "Unknown"
                         products_data.append({
                             "product_id": prod.product_id,
                             "category_id": prod.category_id,
@@ -264,7 +271,8 @@ def get_myitems():
                             "price": float(total_price) / float(sold_quantity),  # Calculate price per unit from total
                             "stock": sold_quantity,  # Use the summed sold quantity
                             "order_date": order_date.strftime('%Y-%m-%d') if order_date else None,
-                            "total_price": float(total_price)  # Total price of the order
+                            "total_price": float(total_price),  # Total price of the order
+                            "buyer_name": buyer_name
                         })
                     return {"products": products_data}
                 
@@ -666,84 +674,31 @@ def dashboard():
     except Exception as e :
         return  {"err" : "interval server error"} , 500
 
-# def initialize_demo_users_and_products():
-#     from werkzeug.security import generate_password_hash
-#     users = [
-#         {"first_name": "Bob", "last_name": "Smith", "email": "bob@example.com", "password": "bobpass", "address": "123 Main St", "phone_number": "1111111111"},
-#         {"first_name": "Alex", "last_name": "Johnson", "email": "alex@example.com", "password": "alexpass", "address": "456 Elm St", "phone_number": "2222222222"},
-#         {"first_name": "Leo", "last_name": "Williams", "email": "leo@example.com", "password": "leopass", "address": "789 Oak St", "phone_number": "3333333333"}
-#     ]
-#     products = [
-#         [
-#             {"product_name": "Bob's Book", "category_id": 1, "SKU": "BOB001", "description": "A great book by Bob", "price": 19.99, "stock": 10},
-#             {"product_name": "Bob's Pen", "category_id": 2, "SKU": "BOB002", "description": "A smooth pen", "price": 2.99, "stock": 50},
-#             {"product_name": "Bob's Bag", "category_id": 3, "SKU": "BOB003", "description": "A sturdy bag", "price": 29.99, "stock": 5}
-#         ],
-#         [
-#             {"product_name": "Alex's Laptop", "category_id": 1, "SKU": "ALEX001", "description": "A fast laptop", "price": 999.99, "stock": 3},
-#             {"product_name": "Alex's Mouse", "category_id": 2, "SKU": "ALEX002", "description": "A wireless mouse", "price": 25.99, "stock": 20},
-#             {"product_name": "Alex's Chair", "category_id": 3, "SKU": "ALEX003", "description": "A comfy chair", "price": 89.99, "stock": 7}
-#         ],
-#         [
-#             {"product_name": "Leo's Lamp", "category_id": 1, "SKU": "LEO001", "description": "A bright lamp", "price": 15.99, "stock": 12},
-#             {"product_name": "Leo's Table", "category_id": 2, "SKU": "LEO002", "description": "A wooden table", "price": 120.00, "stock": 4},
-#             {"product_name": "Leo's Mug", "category_id": 3, "SKU": "LEO003", "description": "A ceramic mug", "price": 7.99, "stock": 30}
-#         ]
-#     ]
-#     from db_config import db, Customer, Product
-#     with app.app_context():
-#         for idx, user in enumerate(users):
-#             existing = Customer.query.filter_by(email=user["email"]).first()
-#             if not existing:
-#                 new_user = Customer(
-#                     first_name=user["first_name"],
-#                     last_name=user["last_name"],
-#                     email=user["email"],
-#                     password=generate_password_hash(user["password"]),
-#                     address=user["address"],
-#                     phone_number=user["phone_number"],
-#                     balance=200.0
-#                 )
-#                 db.session.add(new_user)
-#                 db.session.commit()
-#                 for prod in products[idx]:
-#                     prod_obj = Product(
-#                         product_name=prod["product_name"],
-#                         category_id=prod["category_id"],
-#                         customer_id=new_user.customer_id,
-#                         SKU=prod["SKU"],
-#                         description=prod["description"],
-#                         price=prod["price"],
-#                         stock=prod["stock"]
-#                     )
-#                     db.session.add(prod_obj)
-#                 db.session.commit()
-#         print("Demo users and products initialized.")
+def reset_categories():
+    from db_config import db, Category
+    try:
+        # Delete all existing categories
+        Category.query.delete()
+        db.session.commit()
 
-# # Uncomment and run once to initialize demo data
-# # initialize_demo_users_and_products()
-# # Then comment it out again to avoid duplicate entries
-
+        # Add only the three categories
+        categories = [
+            {"name": "Electronics"},
+            {"name": "Clothes"},
+            {"name": "Accessories"}
+        ]
+        for category_data in categories:
+            new_category = Category(name=category_data["name"])
+            db.session.add(new_category)
+        db.session.commit()
+        return {"message": "Categories initialized successfully", "categories": categories}
+    except Exception as e:
+        db.session.rollback()
+        return {"err": f"Failed to initialize categories: {str(e)}"}, 500
 
 @app.route('/initialize_categories', methods=['POST'])
 def initialize_categories():
-    from db_config import db, Category
-    
-    categories = [
-        {"name": "Electronics"},
-        {"name": "Clothes"},
-        {"name": "Accessories"}
-    ]
-    
-    with app.app_context():
-        for category_data in categories:
-            existing = Category.query.filter_by(name=category_data["name"]).first()
-            if not existing:
-                new_category = Category(name=category_data["name"])
-                db.session.add(new_category)
-        
-        db.session.commit()
-        return {"message": "Categories initialized successfully"}
+    return reset_categories()
 
 
 @app.route('/item/remove', methods=['POST'])
@@ -779,6 +734,38 @@ def remove_item():
         return {"err": f"Internal server error: {str(e)}"}, 500
 
 
-app.run(debug=True)
+@app.route('/payment', methods=['GET'])
+def get_payments():
+    if 'online_market_id' not in session:
+        return {"err": "you are not authorized"}, 402
+    try:
+        cust = Customer.query.get(session['online_market_id'])
+        if not cust:
+            session.clear()
+            return {"err": "you are not authorized"}, 402
+
+        payment_type = request.args.get('type')
+        query = Payment.query.filter_by(customer_id=cust.customer_id)
+        if payment_type in ['deposit', 'withdraw']:
+            query = query.filter_by(type=payment_type)
+        payments = query.order_by(Payment.payment_date.desc()).all()
+        data = [
+            {
+                "amount": float(p.amount),
+                "card_number": p.card_number,
+                "date": p.payment_date.strftime('%Y-%m-%d'),
+                "type": p.type
+            }
+            for p in payments
+        ]
+        return {"payments": data}
+    except Exception as e:
+        return {"err": f"Internal server error: {str(e)}"}, 500
+
+
+if __name__ == "__main__":
+    with app.app_context():
+        print(reset_categories())
+    app.run(debug=True)
 
 

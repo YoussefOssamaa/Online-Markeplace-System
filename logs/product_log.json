@@ -11,3 +11,13 @@
 {"timestamp": "2025-05-10T19:18:48.074255", "event_type": "remove", "description": "Product removed from marketplace", "customer_id": 2, "target": {"product_id": 3}}
 {"timestamp": "2025-05-10T19:19:23.126217", "event_type": "create", "description": "", "customer_id": 2, "target": {"product_id": 4}}
 {"timestamp": "2025-05-10T19:21:34.371660", "event_type": "update", "description": "previous values: price = 20.00, stock = 11", "customer_id": 2, "target": {"product_id": 4}}
+{"timestamp": "2025-05-11T02:15:46.871769", "event_type": "create", "description": "", "customer_id": 1, "target": {"product_id": 1}}
+{"timestamp": "2025-05-11T02:16:36.181482", "event_type": "update", "description": "previous values: price = 80.00, stock = 10", "customer_id": 1, "target": {"product_id": 1}}
+{"timestamp": "2025-05-11T02:16:41.607953", "event_type": "remove", "description": "Product removed from marketplace", "customer_id": 1, "target": {"product_id": 1}}
+{"timestamp": "2025-05-11T02:39:53.203146", "event_type": "create", "description": "", "customer_id": 1, "target": {"product_id": 1}}
+{"timestamp": "2025-05-11T02:41:57.424628", "event_type": "create", "description": "", "customer_id": 1, "target": {"product_id": 1}}
+{"timestamp": "2025-05-11T03:14:33.473463", "event_type": "create", "description": "", "customer_id": 1, "target": {"product_id": 1}}
+{"timestamp": "2025-05-11T03:14:48.121141", "event_type": "create", "description": "", "customer_id": 1, "target": {"product_id": 2}}
+{"timestamp": "2025-05-11T03:14:53.927504", "event_type": "remove", "description": "Product removed from marketplace", "customer_id": 1, "target": {"product_id": 1}}
+{"timestamp": "2025-05-11T03:25:32.905162", "event_type": "create", "description": "", "customer_id": 1, "target": {"product_id": 1}}
+{"timestamp": "2025-05-11T03:32:17.099312", "event_type": "create", "description": "", "customer_id": 1, "target": {"product_id": 1}}

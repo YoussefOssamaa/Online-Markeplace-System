@@ -107,6 +107,6 @@ class OrderItem(db.Model):
     price = db.Column(db.Numeric(4, 2), nullable=False)
 
 # Uncomment if you need to recreate the tables
-# with app.app_context():
-#     db.drop_all()
-#     db.create_all()
+with app.app_context():
+    db.drop_all()
+    db.create_all()

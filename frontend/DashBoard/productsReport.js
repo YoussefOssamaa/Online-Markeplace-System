@@ -48,4 +48,88 @@ document.addEventListener("DOMContentLoaded", () => {
       location.reload(); // Reload the page when products are updated
     }
   });
+
+  function fetchPayments(type) {
+    return fetch(`http://127.0.0.1:5000/payment?type=${type}`, { credentials: "include" })
+      .then(res => res.json())
+      .then(data => data.payments || []);
+  }
+
+  function fetchItems(type) {
+    return fetch(`http://127.0.0.1:5000/item?type=${type}`, { credentials: "include" })
+      .then(res => res.json())
+      .then(data => data.products || []);
+  }
+
+  window.showReport = async function(type) {
+    let html = "";
+    if (type === "deposit" || type === "withdraw") {
+      const payments = await fetchPayments(type);
+      html = `
+        <table class="report-table">
+          <thead><tr><th>Amount</th><th>Card Number</th><th>Date</th></tr></thead>
+          <tbody>
+            ${payments.map(r => `<tr><td>${r.amount}</td><td>${r.card_number}</td><td>${r.date}</td></tr>`).join("")}
+          </tbody>
+        </table>
+      `;
+    } else if (type === "purchase") {
+      const items = await fetchItems("purchased");
+      html = `
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Purchased From</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map(r => `
+              <tr>
+                <td>${r.product_name}</td>
+                <td>${r.price}</td>
+                <td>${r.stock || r.sold_quantity || r.total_quantity}</td>
+                <td>${r.seller_name || ""}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    } else if (type === "sales") {
+      const items = await fetchItems("sold");
+      html = `
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Date</th>
+              <th>Sold To</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map(r => `
+              <tr>
+                <td>${r.product_name}</td>
+                <td>${r.price}</td>
+                <td>${r.stock || r.sold_quantity || r.total_quantity}</td>
+                <td>${r.order_date || r.date || ""}</td>
+                <td>${r.buyer_name || ""}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+    document.getElementById("report-content").innerHTML = html;
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById('tab-' + type).classList.add('active');
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    showReport('deposit');
+  });
   
