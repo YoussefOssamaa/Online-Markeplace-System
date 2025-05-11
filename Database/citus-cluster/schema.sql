@@ -16,9 +16,9 @@ CREATE TABLE Customer (
     last_name VARCHAR(15) NOT NULL,
     email VARCHAR(30) NOT NULL, -- UNIQUE removed due to Citus limitation
     password VARCHAR(256) NOT NULL,
-    address VARCHAR(40),
+    address VARCHAR(40) NOT NULL,
     phone_number VARCHAR(15) NOT NULL, -- UNIQUE removed due to Citus limitation
-    balance FLOAT DEFAULT 0
+    balance FLOAT DEFAULT 0 NOT NULL
 );
 SELECT create_distributed_table('Customer', 'customer_id');
 
@@ -39,14 +39,16 @@ SELECT create_distributed_table('Product', 'product_id');
 
 
 CREATE TABLE Orders (
-    order_id SERIAL,
+    order_id SERIAL PRIMARY KEY ,
     customer_id INTEGER NOT NULL,
     seller_id INTEGER NOT NULL,
     product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
     order_date DATE NOT NULL,
     total_price NUMERIC(5,2) NOT NULL,
-    PRIMARY KEY (order_id, customer_id)
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+    FOREIGN KEY (seller_id) REFERENCES Customer(customer_id),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id)
 );
 
 SELECT create_distributed_table('Orders', 'customer_id');
@@ -62,27 +64,3 @@ CREATE TABLE Payment (
     -- FOREIGN KEY (customer_id) REFERENCES Customer(customer_id) removed
 );
 SELECT create_distributed_table('Payment', 'payment_id');
-
--- OrderItem (distributed table)
-CREATE TABLE OrderItem (
-    order_item_id SERIAL PRIMARY KEY,
-    order_id INTEGER NOT NULL,
-    product_id INTEGER NOT NULL,
-    quantity INTEGER NOT NULL,
-    price NUMERIC(4,2) NOT NULL
-    -- FOREIGN KEY (order_id) REFERENCES Orders(order_id) removed
-    -- FOREIGN KEY (product_id) REFERENCES Product(product_id) removed
-);
-SELECT create_distributed_table('OrderItem', 'order_item_id');
-
--- Cart (distributed table)
-CREATE TABLE Cart (
-    cart_id SERIAL PRIMARY KEY,
-    customer_id INTEGER NOT NULL,
-    product_id INTEGER NOT NULL,
-    quantity INTEGER NOT NULL DEFAULT 1,
-    date_added DATE NOT NULL DEFAULT CURRENT_DATE
-    -- FOREIGN KEY (customer_id) REFERENCES Customer(customer_id) removed
-    -- FOREIGN KEY (product_id) REFERENCES Product(product_id) removed
-);
-SELECT create_distributed_table('Cart', 'cart_id');
