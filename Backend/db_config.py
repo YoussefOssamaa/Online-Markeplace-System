@@ -8,7 +8,9 @@ app = Flask(__name__)
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5433/online_market'
 #app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://market_user:1234QWERa@localhost:5432/online_market"
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5432/online_market'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:%20@localhost:5432/online_market'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:%20@localhost:5432/online_market'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5433/online_market'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -107,6 +109,6 @@ class OrderItem(db.Model):
     price = db.Column(db.Numeric(4, 2), nullable=False)
 
 # Uncomment if you need to recreate the tables
-with app.app_context():
-    db.drop_all()
-    db.create_all()
+#with app.app_context():
+ #   db.drop_all()
+  #  db.create_all()

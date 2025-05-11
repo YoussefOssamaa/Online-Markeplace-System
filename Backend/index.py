@@ -185,7 +185,7 @@ def get_myitems():
                             "category_id": prod.category_id,
                             "product_name": prod.product_name,
                             "category_name": prod.category.name,
-                            "SKU": prod.SKU,
+                            "sku": prod.sku,
                             "description": prod.description,
                             "price": prod.price,
                             "stock": prod.stock
@@ -199,7 +199,7 @@ def get_myitems():
                         Product.product_id,
                         Product.category_id,
                         Product.product_name,
-                        Product.SKU,
+                        Product.sku,
                         Product.description,
                         Orders.total_price,
                         func.sum(Orders.quantity).label('total_quantity'),
@@ -213,7 +213,7 @@ def get_myitems():
                         Product.product_id,
                         Product.category_id,
                         Product.product_name,
-                        Product.SKU,
+                        Product.sku,
                         Product.description,
                         Orders.total_price,
                         Orders.seller_id
@@ -229,7 +229,7 @@ def get_myitems():
                             "category_id": item[1],
                             "product_name": item[2],
                             "category_name": category.name if category else "",
-                            "SKU": item[3],
+                            "sku": item[3],
                             "description": item[4],
                             "price": float(item[5]),  # Use the price from Orders
                             "stock": int(item[6]),  # This is the sum of all purchased quantities
@@ -266,7 +266,7 @@ def get_myitems():
                             "category_id": prod.category_id,
                             "product_name": prod.product_name,
                             "category_name": prod.category.name,
-                            "SKU": prod.SKU,
+                            "sku": prod.sku,
                             "description": prod.description,
                             "price": float(total_price) / float(sold_quantity),  # Calculate price per unit from total
                             "stock": sold_quantity,  # Use the summed sold quantity
@@ -286,7 +286,7 @@ def get_myitems():
                             "category_id": prod.category_id,
                             "product_name": prod.product_name,
                             "category_name": prod.category.name,
-                            "SKU": prod.SKU,
+                            "sku": prod.sku,
                             "description": prod.description,
                             "price": prod.price,
                             "stock": prod.stock
@@ -340,8 +340,8 @@ def edit_item():
                         new_product.stock = product_data["stock"]
                     if 'product_name' in product_data:
                         new_product.product_name = product_data["product_name"]
-                    if 'SKU' in product_data:
-                        new_product.SKU = product_data["SKU"]
+                    if 'sku' in product_data:
+                        new_product.sku = product_data["sku"]
                     if 'category_id' in product_data:
                         new_product.category_id = product_data["category_id"]
                     
@@ -420,7 +420,7 @@ def get_item(product_id):
 
             return {"product": {
                 "product_id": product.product_id, "category_id": product.category_id,
-                "category_name": category.name, "SKU": product.SKU,
+                "category_name": category.name, "sku": product.sku,
                 "description": product.description, "price": product.price,
                 "stock": product.stock,
 
