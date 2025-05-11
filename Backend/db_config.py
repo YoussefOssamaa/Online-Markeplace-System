@@ -23,9 +23,9 @@ class Customer(db.Model):
     last_name = db.Column(db.String(15), nullable=False)
     email = db.Column(db.String(30), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
-    address = db.Column(db.String(40))
+    address = db.Column(db.String(40), nullable=False)
     phone_number = db.Column(db.String(15), nullable=False, unique=True)
-    balance = db.Column(db.Float, default=0)
+    balance = db.Column(db.Float, default=0, nullable=False)
     
     # Note: In Citus, use viewonly=True for relationships that cross distribution boundaries
     # This ensures SQLAlchemy doesn't try to automatically join across shards
@@ -91,7 +91,7 @@ class Product(db.Model):
     is_active = db.Column(db.Boolean, default=True, nullable=False)
 
 
-class Cart(db.Model):
+'''class Cart(db.Model):
     __tablename__ = 'cart'
     cart_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.customer_id'), nullable=False)
@@ -106,7 +106,7 @@ class OrderItem(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Numeric(4, 2), nullable=False)
+    price = db.Column(db.Numeric(4, 2), nullable=False)'''
 
 # Uncomment if you need to recreate the tables
 #with app.app_context():
