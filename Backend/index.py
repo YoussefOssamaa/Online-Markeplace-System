@@ -575,14 +575,14 @@ def purchase_item():
             db.session.add(new_order)
             db.session.flush()  # Get the order ID without committing
 
-            # Create order item
+            '''# Create order item
             order_item = OrderItem(
                 order_id=new_order.order_id,
                 product_id=product.product_id,
                 quantity=quantity,
                 price=total_price
             )
-            db.session.add(order_item)
+            db.session.add(order_item)'''
 
             # Create payment record
             payment = Payment(
