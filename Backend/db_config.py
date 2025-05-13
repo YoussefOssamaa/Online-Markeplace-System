@@ -5,16 +5,28 @@ from datetime import date
 app = Flask(__name__)
 
 # Update connection string to connect to Citus Docker container
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5433/online_market'
-#app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql+psycopg2://market_user:1234QWERa@localhost:5432/online_market"
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5432/online_market'
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:%20@localhost:5432/online_market'
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5433/online_market'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5432/online_marketplace'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:%20@localhost:5432/online_marketplace'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+class Cart(db.Model):
+    __tablename__ = 'cart'
+    cart_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.customer_id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'), nullable=False)
+    quantity = db.Column(db.Integer, default=1, nullable=False)
+    date_added = db.Column(db.Date, default=date.today, nullable=False)
+
+class OrderItem(db.Model):
+    __tablename__ = 'orderitem'
+    order_item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.order_id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.product_id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Numeric(4, 2), nullable=False)
 
 class Customer(db.Model):
     __tablename__ = 'customer'
@@ -109,6 +121,5 @@ class OrderItem(db.Model):
     price = db.Column(db.Numeric(4, 2), nullable=False)'''
 
 # Uncomment if you need to recreate the tables
-#with app.app_context():
- #   db.drop_all()
-  #  db.create_all()
+with app.app_context():
+    db.create_all()
