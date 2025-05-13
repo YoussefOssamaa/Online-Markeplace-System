@@ -39,8 +39,6 @@ class Customer(db.Model):
     phone_number = db.Column(db.String(15), nullable=False, unique=True)
     balance = db.Column(db.Float, default=0, nullable=False)
     
-    # Note: In Citus, use viewonly=True for relationships that cross distribution boundaries
-    # This ensures SQLAlchemy doesn't try to automatically join across shards
     orders = db.relationship('Orders', backref='customer', lazy=True, 
                            foreign_keys="Orders.customer_id", viewonly=True)
     sold_orders = db.relationship('Orders', backref='seller', lazy=True, 

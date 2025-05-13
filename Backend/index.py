@@ -67,11 +67,9 @@ def sign_up():
             return {"err": "the data you entered already exists"}, 400
 
         except (OperationalError) as e:
-            # Log the specific error for debugging
             print(f"Database operational error: {str(e)}")
             return {"err": f"Database connection error: {str(e)}"}, 500
         except Exception as e:
-            # Log the specific error for debugging
             print(f"Unexpected error in signup: {str(e)}")
             return {"err": f"Internal server error: {str(e)}"}, 500
 
@@ -610,7 +608,7 @@ def purchase_item():
 
     except (IntegrityError, DataError) as e:
         db.session.rollback()
-        return {"err": f"Data error occurred: {str(e)}"}, 400  # Added error details for debugging
+        return {"err": f"Data error occurred: {str(e)}"}, 400
     except Exception as e:
         db.session.rollback()
         return {"err": f"Internal server error: {str(e)}"}, 500
