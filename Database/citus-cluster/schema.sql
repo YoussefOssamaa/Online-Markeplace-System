@@ -1,28 +1,26 @@
--- schema.sql
--- Ensure the Citus extension is enabled
 CREATE EXTENSION IF NOT EXISTS citus;
 
--- Category (reference table)
+
 CREATE TABLE Category (
     category_id SERIAL PRIMARY KEY,
     name VARCHAR(20) NOT NULL
 );
 SELECT create_reference_table('Category');
 
--- Customer (distributed table)
+
 CREATE TABLE Customer (
     customer_id SERIAL PRIMARY KEY,
     first_name VARCHAR(15) NOT NULL,
     last_name VARCHAR(15) NOT NULL,
-    email VARCHAR(30) NOT NULL, -- UNIQUE removed due to Citus limitation
+    email VARCHAR(30) NOT NULL,
     password VARCHAR(256) NOT NULL,
     address VARCHAR(40) NOT NULL,
-    phone_number VARCHAR(15) NOT NULL, -- UNIQUE removed due to Citus limitation
+    phone_number VARCHAR(15) NOT NULL,
     balance FLOAT DEFAULT 0 NOT NULL
 );
 SELECT create_distributed_table('Customer', 'customer_id');
 
--- Product (distributed table)
+
 CREATE TABLE Product (
     product_id SERIAL PRIMARY KEY,
     product_name VARCHAR NOT NULL,
@@ -32,8 +30,8 @@ CREATE TABLE Product (
     description TEXT NOT NULL,
     price NUMERIC(4,2) NOT NULL,
     stock INTEGER NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES Category(category_id)
-    -- FOREIGN KEY (customer_id) REFERENCES Customer(customer_id) removed
+    FOREIGN KEY (category_id) REFERENCES Category(category_id),
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id)
 );
 SELECT create_distributed_table('Product', 'product_id');
 
@@ -53,14 +51,14 @@ CREATE TABLE Orders (
 
 SELECT create_distributed_table('Orders', 'customer_id');
 
--- Payment (distributed table)
+
 CREATE TABLE Payment (
     payment_id SERIAL PRIMARY KEY,
     customer_id INTEGER NOT NULL,
     payment_date DATE NOT NULL DEFAULT CURRENT_DATE,
     card_number VARCHAR(20),
     type VARCHAR(20) NOT NULL,
-    amount NUMERIC(5,2) NOT NULL
-    -- FOREIGN KEY (customer_id) REFERENCES Customer(customer_id) removed
+    amount NUMERIC(5,2) NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id)
 );
-SELECT create_distributed_table('Payment', 'payment_id');
+SELECT create_distributed_table('Payment', 'customer_id');
